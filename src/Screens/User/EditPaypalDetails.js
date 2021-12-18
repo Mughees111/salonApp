@@ -2,50 +2,48 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native'
 import { goBack, navigate } from '../../../Navigations';
-import { ArrowLeft, ArrowRight, FbIcon, GoogleIcon } from '../../Components/Svgs';
+import { ArrowRight, FbIcon, GoogleIcon, ArrowLeft } from '../../Components/Svgs';
 import { acolors } from '../../Components/AppColors';
 import { TextInput } from 'react-native-gesture-handler';
 import CustomTextInput from '../../Components/CustomTextInput';
 import PrivacyPicker from '../../Components/PrivacyPicker';
 import { MainButton } from '../../Components/Buttons';
 
-const ForgetPass = () => {
+const EditPayPalDetails = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
-
+            <StatusBar
+                hidden={true}
+            />
 
             <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
-
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <TouchableOpacity
-                        onPress={() => goBack()}
+                    <TouchableOpacity 
+                        onPress={()=>goBack()}
                         style={{ width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft />
                     </TouchableOpacity>
-                    <Text style={{ fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Forgot Password</Text>
+                    <Text style={{ fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Edit Paypal Details</Text>
                     <Text>          </Text>
                 </View>
                 <ScrollView>
-                    <Text style={{ fontFamily: 'PRe', fontSize: 14, color: acolors.white, marginTop: 20 }}>Don’t worry. We have got you covered. Enter your
-                        registered phone number and we will send OTP to reset your password</Text>
-
-
+                    
+                    <Text style={{ marginTop: 3, fontFamily: 'PRe', fontSize: 16, color: acolors.white,marginTop:30 }}>Edit Detail</Text>
                     <CustomTextInput
-                        placeholder="Phone Number"
-                        keyboardType="number-pad"
-                        keyboardAppearance="dark"
+                        placeholder="Email"
                         style={{ marginTop: 20 }}
                     />
 
-
-
-                    <MainButton
-                        text="Submit"
-                        btnStyle={{ marginTop: 80 }}
-                        onPress={() => { navigate('ForgetPassOpt') }}
+                    <CustomTextInput
+                        placeholder="Password"
+                        style={{ marginTop: 15, }}
                     />
 
-
+                    <MainButton
+                        text="Save Chnages"
+                        btnStyle={{ marginTop: 30 }}
+                        onPress={() => { navigate('SignIn') }}
+                    />
 
                 </ScrollView>
 
@@ -73,4 +71,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default ForgetPass
+export default EditPayPalDetails

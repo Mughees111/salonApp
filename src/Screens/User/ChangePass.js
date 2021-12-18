@@ -9,7 +9,7 @@ import CustomTextInput from '../../Components/CustomTextInput';
 import PrivacyPicker from '../../Components/PrivacyPicker';
 import { MainButton } from '../../Components/Buttons';
 
-const ForgetPass = () => {
+const ChangePass = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
 
@@ -27,7 +27,7 @@ const ForgetPass = () => {
                 </View>
                 <ScrollView>
                     <Text style={{ fontFamily: 'PRe', fontSize: 14, color: acolors.white, marginTop: 20 }}>Don’t worry. We have got you covered. Enter your
-                        registered phone number and we will send OTP to reset your password</Text>
+registered phone number and we will send OTP to reset your password</Text>
 
 
                     <CustomTextInput
@@ -73,4 +73,4 @@ const styles = StyleSheet.create({
 
 })
 
-export default ForgetPass
+export default ChangePass
