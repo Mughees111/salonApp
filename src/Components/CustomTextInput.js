@@ -5,6 +5,7 @@ import { acolors } from './AppColors';
 const CustomTextInput = ({ style, onChangeText, placeholder, placeholderTextColor, secureTextEntry = false, autoFocus = false, keyboardType, keyboardAppearance }) => {
     return (
         <TextInput
+            autoCapitalize='none'
             placeholder={placeholder}
             placeholderTextColor={placeholderTextColor ? placeholder : acolors.white}
             style={[styles.textInput, style]}

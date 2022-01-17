@@ -1,20 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, Dimensions, Alert, ScrollView, Switch } from 'react-native'
+import DropdownAlert from 'react-native-dropdownalert';
 import { TextInput } from 'react-native-gesture-handler';
+import { changeLoggedIn, loggedInObservable } from '../../../Common';
 import { goBack, navigate, navigateFromStack } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
 import { MainButton } from '../../Components/Buttons';
 import { Header } from '../../Components/Header';
 import Reviews from '../../Components/Reviews';
 import { ArrowLeft, NotificationIcon, PaymentMethodIcon, ProfileIcon, HeartSettingIcon, SettingsIcon, TermsIcon, LogoutIcon, ArrowForward } from '../../Components/Svgs';
+import { Context } from '../../Context/DataContext';
+import { apiRequest, } from '../../utils/apiCalls';
+import { urls } from '../../utils/Api_urls';
 
+import { doConsole, retrieveItem, storeItem, getParamFromURL } from "../../utils/functions";
+import Loader from '../../utils/Loader';
+
+
+var alertRef;
 
 const UserScreen = () => {
-    
 
 
-   
+
+    const [loading, setLoading] = useState(false)
+    const { state } = useContext(Context);
+    const userData = state.userData
+
+
+
 
     const SettingView = ({ text, onPress, icon, navigateTo }) => {
         var Icon = icon
@@ -39,18 +54,20 @@ const UserScreen = () => {
 
 
 
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
                 hidden={false}
-                backgroundColor={acolors.primary}
+                backgroundColor={acolors.bgColor}
+                style='light'
             />
-            <View style={{ width: "100%", height: 200,marginTop:25 }}>
+            <View style={{ width: "100%", height: 200, marginTop: 30 }}>
 
                 <Image
-                    style={{ width: "100%", resizeMode: 'stretch', height: 200 }}
-                    source={require('../../assets/profileImg.png')}
+                    style={{ width: "100%", resizeMode: 'contain', height: "100%", borderRadius: 15 }}
+                    source={{ uri: userData.profile_pic_url }
+                        // require('../../assets/profileImg.png')
+                    }
                 />
                 <Image
                     style={{ position: 'absolute', width: "100%", bottom: 0, resizeMode: 'stretch' }}
@@ -62,8 +79,8 @@ const UserScreen = () => {
                     <ArrowLeft />
                 </TouchableOpacity>
                 <View style={{ position: 'absolute', bottom: 10, left: 20 }}>
-                    <Text style={{ fontFamily: 'PBl', fontSize: 22, lineHeight: 30, color: 'white', }}>William James</Text>
-                    <Text style={{ fontFamily: 'PRe', fontSize: 14, lineHeight: 22, color: '#E9E9E9', }}>+1 998290 73829</Text>
+                    <Text style={{ fontFamily: 'PBl', fontSize: 22, lineHeight: 30, color: 'white', }}>{userData?.username}</Text>
+                    <Text style={{ fontFamily: 'PRe', fontSize: 14, lineHeight: 22, color: '#E9E9E9', }}>{userData?.phone}</Text>
                 </View>
             </View>
             <ScrollView>
@@ -106,14 +123,53 @@ const UserScreen = () => {
                     />
                 </View>
                 <View style={styles.containers}>
-                    <SettingView
+                    <TouchableOpacity
+                        onPress={() => {
+                            retrieveItem('login_data')
+                                .then(data => {
+                                    if (data.token) {
+                                        setLoading(true)
+                                        storeItem('login_data', '')
+                                        apiRequest({ token: data.token }, 'logout')
+                                            .then(data => {
+                                                console.log(data)
+                                                setLoading(false)
+                                                if (data.action == 'success') {
+                                                    changeLoggedIn.changeNow(2);
+                                                }
+                                            })
+                                            .catch(err => {
+                                                alertRef.alertWithType("error", urls.error_title, urls.error);
+                                                setLoading(false)
+                                            })
+                                    }
+
+                                })
+                            // 
+
+                        }}
+                        style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }
+                        }>
+                        <View style={styles.iconCircle}>
+                            <LogoutIcon />
+                        </View>
+                        <Text style={styles.text}>Log Out</Text>
+                        <TouchableOpacity style={{ position: 'absolute', right: 5, }}>
+                            <ArrowForward color="rgba(226, 179, 120, 0.05)" />
+                        </TouchableOpacity>
+                    </TouchableOpacity >
+                    {/* <SettingView
                         icon={LogoutIcon}
                         text="Log Out"
-                        onPress={() => console.log('presed')}
-                    />
+                        onPress={() => {
+                            console.log('asd')
+                           
+                        }}
+                    /> */}
                 </View>
             </ScrollView>
-
+            {loading && <Loader />}
+            <DropdownAlert ref={(ref) => alertRef = ref} />
         </SafeAreaView>
     )
 }

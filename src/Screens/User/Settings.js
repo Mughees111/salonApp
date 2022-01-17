@@ -37,13 +37,14 @@ const Settings = () => {
     return (
         <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
+                hidden={false}
+                backgroundColor={acolors.bgColor}
                 style='light'
-            // translucent={false}
             />
             <SafeAreaView style={{ flex: 1, marginTop: 25 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Settings" />
-                    <TouchableOpacity onPress={()=>navigate('ChangePass')}  style={styles.containers}>
+                    <TouchableOpacity onPress={() => navigate('ChangePass')} style={styles.containers}>
                         <SettingView
                             text="Change Password"
                             icon={PassIcon}
@@ -73,9 +74,9 @@ const styles = StyleSheet.create({
         marginLeft: 10
     },
     containers: {
-        marginTop: 50, 
-        width: "100%", 
-        alignSelf: 'center', 
+        marginTop: 50,
+        width: "100%",
+        alignSelf: 'center',
         backgroundColor: '#1B1B1B', paddingBottom: 15, paddingHorizontal: 10,
     }
 })

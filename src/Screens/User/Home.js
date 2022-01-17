@@ -1,64 +1,134 @@
+
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useState } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList ,ScrollView} from 'react-native'
+import React, { useCallback, useState, useEffect, useContext } from 'react'
+import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
 import { navigate } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
 import { ChatIcon, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, RattingStarIcon, SearchIcon } from '../../Components/Svgs';
 
+import { useFocusEffect } from '@react-navigation/native';
+import { apiRequest } from '../../utils/apiCalls';
+import { retrieveItem, useForceUpdate, } from '../../utils/functions';
+import Loader from '../../utils/Loader';
+import DropdownAlert from 'react-native-dropdownalert';
+import { Context } from '../../Context/DataContext';
+
+import * as Location from 'expo-location';
+
+var alertRef;
 const Home = () => {
 
-    const [tabs, setTabs] = useState({
-        men: true,
-        women: false
-    })
+    const forceUpdate = useForceUpdate();
+    const { state, setUserGlobal ,setUserLocationGlobal} = useContext(Context);
+    const [loading, setLoading] = useState(false);
+
+    const [tabs, setTabs] = useState({ men: true, women: false })
+    const [mensData, setMensData] = useState([]);
+    const [womensData, setWomensData] = useState([]);
+    const [recommended, setRecommended] = useState([]);
+
+    const [searchWord, setSearchWord] = useState('');
+
+    const [lat, setLat] = useState('')
+    const [lng, setLng] = useState('')
+
+
+    async function get_salons() {
+
+        setLoading(true)
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission to access location was denied');
+            return;
+        }
+
+        var locationn = await Location.getCurrentPositionAsync({});
+        setUserLocationGlobal(locationn)
+
+        retrieveItem('login_data')
+            .then(data => {
+                if (data?.token) {
+                    const postObj = {
+                        lat: locationn?.coords?.latitude,
+                        lng: locationn?.coords?.longitude,
+                        token: data.token
+                    }
+                    console.log(postObj)
+
+                    
+                    apiRequest(postObj, 'get_salons')
+                        .then(data => {
+                            setLoading(false)
+                            if (data.action == 'success') {
+                                setMensData(data.data.mens);
+                                setWomensData(data.data.womens);
+                                setRecommended(data.data.setRecommended)
+                                forceUpdate();
+                            }
+                            else {
+                                alertRef.alertWithType('error', 'Error', data.error);
+                            };
+                        })
+                        .catch(err => {
+                            setLoading(false)
+                        })
+                };
+            });
+    }
+
 
     const keyExtractor = ((item, index) => index.toString())
 
-    const mensArray = [
-        { img: require('../../assets/salonImg1.png'), title: "Hiana Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg2.png'), title: "Adward’s Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg1.png'), title: "Serena Men Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg2.png'), title: "Forever Men Saloon", address: "817 Street maas Buleva..." },
-    ]
-    const womensArray = [
-        { img: require('../../assets/salonImg3.png'), title: "Hiana Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg4.png'), title: "Adward’s Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg3.png'), title: "Serena Men Saloon", address: "817 Street main Buleva..." },
-        { img: require('../../assets/salonImg4.png'), title: "Forever Men Saloon", address: "817 Street maas Buleva..." },
-    ]
+    useFocusEffect(useCallback(() => {
+        retrieveItem('login_data')
+            .then(data => {
+                if (data) {
+                    setUserGlobal(data)
+                }
+            })
+        get_salons()
+    }, [],
+    ))
+    // useEffect(() => {
+    //     get_salons()
+    // }, [])
+
 
     const SalonGridView = useCallback((item, index) => {
         var item = item.item
         return (
             <TouchableOpacity
-                onPress={() => navigate('SalonDetails')}
+                onPress={() => {
+                    // console.log(item)
+                    navigate('SalonDetails', item)
+                }}
                 style={{ width: 160, marginLeft: 15, height: 188, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}>
 
                 <Image
-                    style={{ position: 'absolute', width: 160, height: 188 }}
-                    source={item.img}
+                    style={{ position: 'absolute', width: 160, height: 188, borderRadius: 10, resizeMode: 'stretch' }}
+                    source={{ uri: item.sal_profile_pic }}
 
                 />
                 <Image
                     style={{ position: 'absolute', bottom: 0 }}
                     source={require('../../assets/salonShopMask.png')}
                 />
-                <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.title}</Text>
+                <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.sal_name}</Text>
                 <View style={{ flexDirection: 'row' }}>
                     <LocationIcon color="rgba(252, 252, 252, 0.5)" />
                     <Text
                         numberOfLines={1}
                         ellipsizeMode='tail'
-                        style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.address}</Text>
+                        style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5</Text>
+                    <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
                         <RattingStarIcon />
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5 Km</Text>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance + " Km"} </Text>
                     </View>
 
                 </View>
@@ -66,7 +136,7 @@ const Home = () => {
 
 
 
-            </TouchableOpacity>
+            </TouchableOpacity >
         )
     }, [])
 
@@ -74,9 +144,12 @@ const Home = () => {
         <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
                 hidden={false}
+                backgroundColor={acolors.bgColor}
                 style='light'
                 translucent={true}
             />
+            {loading && <Loader />}
+            <DropdownAlert ref={(ref) => alertRef = ref} />
             <Image
                 source={require('../../assets/HomeImg1.png')}
                 style={{ width: "100%", resizeMode: 'stretch', }}
@@ -88,7 +161,7 @@ const Home = () => {
             />
             <SafeAreaView style={{ position: 'absolute', top: 28 }}>
                 <View style={{ paddingHorizontal: 20 }}>
-                    <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello William,</Text>
+                    <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello {state?.userData?.username},</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
                             <LocationIcon />
@@ -116,10 +189,16 @@ const Home = () => {
                                 placeholderTextColor="rgba(252, 252, 252, 1)"
                                 returnKeyLabel='Search'
                                 enablesReturnKeyAutomatically={true}
-                                onSubmitEditing={() => {
-                                    navigate('SearchScreen')
+                                onChangeText={setSearchWord}
+                                onSubmitEditing={(v) => {
+                                    // searchSalon()
+                                    // console.log(searchWord)
+                                    if (searchWord) {
+                                        navigate('SearchScreen', searchWord)
+                                    }
+
                                 }}
-                                style={{ marginLeft: 10, color: 'rgba(252, 252, 252, 1)', fontFamily: 'PRe',flex:1 }}
+                                style={{ marginLeft: 10, color: 'rgba(252, 252, 252, 1)', fontFamily: 'PRe', flex: 1 }}
                             />
                         </View>
                         <TouchableOpacity
@@ -153,7 +232,7 @@ const Home = () => {
                         <Text style={tabs.women ? styles.activeTabText : styles.inActiveTabText}>Women</Text>
                     </TouchableOpacity>
                 </View>
-                <ScrollView contentContainerStyle={{paddingBottom:400}} >
+                <ScrollView contentContainerStyle={{ paddingBottom: 400 }} >
                     <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Nearest To You</Text>
                         <TouchableOpacity>
@@ -164,7 +243,7 @@ const Home = () => {
                         tabs.men &&
                         <>
                             <FlatList
-                                data={mensArray}
+                                data={mensData}
                                 horizontal={true}
                                 style={{ marginTop: 10, }}
                                 keyExtractor={keyExtractor}
@@ -180,7 +259,7 @@ const Home = () => {
                                 </TouchableOpacity>
                             </View>
                             <FlatList
-                                data={mensArray}
+                                data={recommended}
                                 horizontal={true}
                                 style={{ marginTop: 10, }}
                                 keyExtractor={keyExtractor}
@@ -195,7 +274,7 @@ const Home = () => {
                         tabs.women &&
                         <>
                             <FlatList
-                                data={womensArray}
+                                data={womensData}
                                 horizontal={true}
                                 style={{ marginTop: 10, }}
                                 keyExtractor={keyExtractor}
@@ -211,7 +290,7 @@ const Home = () => {
                                 </TouchableOpacity>
                             </View>
                             <FlatList
-                                data={womensArray}
+                                data={recommended}
                                 horizontal={true}
                                 style={{ marginTop: 10, }}
                                 keyExtractor={keyExtractor}

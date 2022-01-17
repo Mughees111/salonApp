@@ -25,7 +25,7 @@
 //                     <Text>          </Text>
 //                 </View>
 //                 <ScrollView>
-                    
+
 //                     <Text style={{ marginTop: 3, fontFamily: 'PRe', fontSize: 16, color: acolors.white,marginTop:30 }}>Let's reset your password</Text>
 //                     <CustomTextInput
 //                         placeholder="Your new password"
@@ -84,22 +84,23 @@ import { goBack, navigate } from '../../../Navigations';
 
 const NewPass = () => {
     return (
-        <View style={{ flex: 1, backgroundColor: 'black' }}>
-        <StatusBar
+        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+            <StatusBar
                 hidden={false}
-                backgroundColor={'#fff'}
+                backgroundColor={acolors.bgColor}
+                style='light'
             />
             <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' ,marginTop:20}}>
-                    <TouchableOpacity  onPress={()=>goBack()} style={{ width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+                    <TouchableOpacity onPress={() => goBack()} style={{ width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft />
                     </TouchableOpacity>
                     <Text style={{ fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Enter New Password</Text>
                     <Text>          </Text>
                 </View>
                 <ScrollView>
-                    
-                    <Text style={{ marginTop: 3, fontFamily: 'PRe', fontSize: 16, color: acolors.white,marginTop:30 }}>Let's reset your password</Text>
+
+                    <Text style={{ marginTop: 3, fontFamily: 'PRe', fontSize: 16, color: acolors.white, marginTop: 30 }}>Let's reset your password</Text>
                     <CustomTextInput
                         placeholder="Your new password"
                         style={{ marginTop: 20 }}

@@ -17,15 +17,15 @@ const Notifications = () => {
 
 
     const renderItem = ({ item }) => (
-        <View style={{flexDirection:'row',width:"100%",marginTop:20,}}>
+        <View style={{ flexDirection: 'row', width: "100%", marginTop: 20, }}>
             <Image
                 source={item.img}
-                style={{width:55,height:55,borderRadius:22.5}}
+                style={{ width: 55, height: 55, borderRadius: 22.5 }}
             />
-            <View style={{marginLeft:10,}}>
-                <Text style={{fontFamily:'PRe',fontSize:14,color:'#FCFCFC'}}>{item.title}</Text>
-                <Text style={{fontFamily:'PRe',fontSize:12,color:'#FFFFFF',marginTop:3,}}>Adward’s Saloon</Text>
-                <Text style={{fontFamily:'PRe',fontSize:12,color:'#FFFFFF',marginTop:3,}}>{item.time}</Text>
+            <View style={{ marginLeft: 10, }}>
+                <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FCFCFC' }}>{item.title}</Text>
+                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginTop: 3, }}>Adward’s Saloon</Text>
+                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginTop: 3, }}>{item.time}</Text>
             </View>
 
         </View>
@@ -34,10 +34,11 @@ const Notifications = () => {
     return (
         <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
+                hidden={false}
+                backgroundColor={acolors.bgColor}
                 style='light'
-                translucent={true}
             />
-            <SafeAreaView style={{ flex: 1,marginTop:25 }}>
+            <SafeAreaView style={{ flex: 1, marginTop: 25 }}>
                 <View style={{ paddingHorizontal: 20, }}>
                     <Header title="Notification" />
                     <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are all your notifications</Text>
@@ -46,16 +47,16 @@ const Notifications = () => {
                         showsVerticalScrollIndicator={false}
                         style={{ marginLeft: -10 }}
                         data={[
-                            { time : "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
-                            { time : "Reminder", title: "1h left in your appointment", img: require('../../assets/not2.png') },
-                            { time : "11:55 PM", title: "You got a message", img: require('../../assets/not4.png') },
-                            { time : "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
-                            { time : "Reminder", title: "1h left in your appointment", img: require('../../assets/not2.png') },
-                            { time : "04:30 PM", title: "You got a message", img: require('../../assets/not4.png') },
-                            { time : "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
-                            { time : "04:30 PM", title: "1h left in your appointment", img: require('../../assets/not2.png') },
-                            { time : "04:30 PM", title: "Your appointment has been booked", img: require('../../assets/not4.png') },
-                            { time : "04:30 PM", title: "1h left in your appointment", img: require('../../assets/not2.png') },
+                            { time: "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
+                            { time: "Reminder", title: "1h left in your appointment", img: require('../../assets/not2.png') },
+                            { time: "11:55 PM", title: "You got a message", img: require('../../assets/not4.png') },
+                            { time: "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
+                            { time: "Reminder", title: "1h left in your appointment", img: require('../../assets/not2.png') },
+                            { time: "04:30 PM", title: "You got a message", img: require('../../assets/not4.png') },
+                            { time: "04:30 PM", title: "Your appointment has been booked ", img: require('../../assets/not1.png') },
+                            { time: "04:30 PM", title: "1h left in your appointment", img: require('../../assets/not2.png') },
+                            { time: "04:30 PM", title: "Your appointment has been booked", img: require('../../assets/not4.png') },
+                            { time: "04:30 PM", title: "1h left in your appointment", img: require('../../assets/not2.png') },
                         ]}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={renderItem}

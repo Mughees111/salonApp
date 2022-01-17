@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import OnBoarding1 from './src/Screens/User/OnBoarding1';
@@ -43,6 +43,14 @@ import Settings from './src/Screens/User/Settings';
 import ChangePass from './src/Screens/User/ChangePass';
 import NotificationSettings from './src/Screens/User/NotificationSettings';
 import Favourites from './src/Screens/User/Favourite';
+
+import { doConsole, retrieveItem, storeItem, getParamFromURL } from "./src/utils/functions";
+import DropdownAlert from "react-native-dropdownalert";
+import { alertmsg, changeLoggedIn, loggedInObservable, navigateToPostNow, showmsg } from './Common';
+import { urls } from './src/utils/Api_urls';
+import { Provider } from './src/Context/DataContext';
+
+
 
 const OnBoarding = createMaterialTopTabNavigator()
 const Stack = createStackNavigator()
@@ -114,10 +122,13 @@ function SettingsStack() {
   )
 }
 
-
 function AppintmentsStack() {
   return <Stack.Navigator screenOptions={{ headerShown: false }} >
     <Stack.Screen name='AppointSchedule' component={AppointSchedule} />
+    <Stack.Screen name="SeeAllServices" component={SeeAllServices} />
+    <Stack.Screen name="BookAppointment" component={BookAppointment} />
+    <Stack.Screen name="AppointBooked" component={AppointBooked} />
+    <Stack.Screen name="PaymentMethod" component={PaymentMethod} />
   </Stack.Navigator >
 }
 
@@ -174,11 +185,18 @@ function BottomTabNavigator() {
 }
 
 
+const useForceUpdate = () => {
+  const [, updateState] = React.useState();
+  return React.useCallback(() => updateState({}), []);
+}
 
 
 export default function App() {
 
 
+  const forceUpdate = useForceUpdate();
+
+  const [loggedIn, setLoggedIn] = useState(0)
   const [loaded] = useFonts({
     PBo: require('./assets/fonts/Poppins/Poppins-Bold.ttf'),
     PRe: require('./assets/fonts/Poppins/Poppins-Regular.ttf'),
@@ -189,22 +207,104 @@ export default function App() {
 
   })
 
+
+  const checkWithServer = (data) => {
+    if (data) var token = data.token;
+    else var token = "khali";
+    var body_data = { token: token };
+    doConsole(" I request @ " + urls.API + "check_login");
+    doConsole(body_data);
+    fetch(urls.API + 'check_login', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body_data),
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        doConsole(" I receive ");
+        doConsole(responseJson);
+        if (responseJson.action == "success") {
+          storeItem("login_data", responseJson.data).then(() => {
+            setLoggedIn(1)
+            forceUpdate()
+          });
+        }
+        else {
+          setLoggedIn(2)
+          forceUpdate()
+        }
+
+      }).catch((error) => {
+        setLoggedIn(2)
+        forceUpdate()
+      });
+
+  }
+
+  function checkLoggedIn() {
+    retrieveItem("login_data").then((data) => {
+      if (data) {
+        console.log(data)
+        checkWithServer(data)
+      }
+      else {
+        setLoggedIn(2)
+      }
+      forceUpdate();
+    })
+  }
+
+
+  useEffect(() => {
+
+    checkLogin()
+  }, [])
+
+
+  function checkLogin() {
+    console.log("ever came here")
+    checkLoggedIn()
+    loggedInObservable.subscribe((v) => {
+      console.log("Yessss won the warrrrr");
+      console.log(v)
+      console.log(v)
+      setLoggedIn(v)
+    })
+  }
+
+
+
+
   if (!loaded) return null
 
   return (
-    <NavigationContainer
-      ref={navigationRef}
-    >
-      <Stack.Navigator screenOptions={{ headerShown: false }} >
-        <Stack.Screen name="OnBoardingStack" component={OnBoardingTabs} />
-        <Stack.Screen name="AuthStack" component={AuthStack} />
-        <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-        <Stack.Screen name="CancellationPolicy" component={CancellationPolicy} />
-        <Stack.Screen name="TermsOfServices" component={TermsOfServices} />
-        <Stack.Screen name="Favourites" component={Favourites} />
-
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider>
+      <NavigationContainer
+        ref={navigationRef}
+      >
+        {/* <Stack.Navigator screenOptions={{ headerShown: false }} > */}
+        {
+          loggedIn == 2 &&
+          <Stack.Navigator screenOptions={{ headerShown: false }} >
+            <Stack.Screen name="OnBoardingStack" component={OnBoardingTabs} />
+            <Stack.Screen name="AuthStack" component={AuthStack} />
+          </Stack.Navigator>
+        }
+        {
+          loggedIn == 1 &&
+          <Stack.Navigator screenOptions={{ headerShown: false }} >
+            <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+            <Stack.Screen name="CancellationPolicy" component={CancellationPolicy} />
+            <Stack.Screen name="TermsOfServices" component={TermsOfServices} />
+            <Stack.Screen name="Favourites" component={Favourites} />
+          </Stack.Navigator>
+        }
+        {/* </Stack.Navigator> */}
+      </NavigationContainer>
+    </Provider>
   );
 }
 

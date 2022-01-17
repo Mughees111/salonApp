@@ -11,13 +11,17 @@ import { MainButton } from '../../Components/Buttons';
 
 const ForgetPassOpt = () => {
     return (
-        <View style={{ flex: 1, backgroundColor: 'black' }}>
-
+        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+            <StatusBar
+                hidden={false}
+                backgroundColor={acolors.bgColor}
+                style='light'
+            />
 
             <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <TouchableOpacity 
-                        onPress={()=>goBack()}
+                    <TouchableOpacity
+                        onPress={() => goBack()}
                         style={{ width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft />
                     </TouchableOpacity>

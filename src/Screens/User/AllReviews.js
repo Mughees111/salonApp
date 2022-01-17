@@ -37,7 +37,8 @@ const AllReviews = () => {
         <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
                 style='light'
-                translucent={true}
+                backgroundColor={acolors.bgColor}
+                // translucent={true}
             />
             <SafeAreaView style={{ flex: 1, height: Dimensions.get('window').height,marginTop:28 }}>
                 <View style={{ paddingHorizontal: 20 }}>

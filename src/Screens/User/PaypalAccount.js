@@ -14,6 +14,7 @@ const PaypalAccount = () => {
         <View style={{ flex: 1, backgroundColor: 'black' }}>
             <StatusBar
                 style='light'
+                backgroundColor={acolors.bgColor}
                 // hidden={true}
             />
 

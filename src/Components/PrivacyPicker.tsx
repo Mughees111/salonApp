@@ -37,7 +37,7 @@ const PrivacyPicker = (props: Props) => {
   const [modal, setModal] = React.useState(false);
   var temp = props.selected
   if(!temp.title) temp.title = 'Select'
-  console.log(temp)
+  // console.log(temp)
   const [current, setCurrnet] = React.useState(temp);
 
 

@@ -13,8 +13,9 @@ const AddCardDetails = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
             <StatusBar
-                style="light"
-                // hidden={true}
+                style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={true}
             />
 
             <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
@@ -34,7 +35,7 @@ const AddCardDetails = () => {
                         <PaypalIcon />
                     </View>
                     <Image
-                        style={{marginTop:15,width:"100%",resizeMode:'contain'}}
+                        style={{ marginTop: 15, width: "100%", resizeMode: 'contain' }}
                         source={require('../../assets/cardDetails.png')}
                     />
                     <CustomTextInput

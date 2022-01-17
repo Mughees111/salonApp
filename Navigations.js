@@ -7,10 +7,8 @@ import React from 'react'
 export const navigationRef = React.createRef();
 
 
-export const navigate = (screen, params ) => {
-    navigationRef.current && navigationRef.current.navigate(screen, {
-        params
-    })
+export const navigate = (screen, params) => {
+    navigationRef.current && navigationRef.current.navigate(screen, params)
 }
 
 export const navigateFromStack = (stack, screen, params) => {
@@ -22,7 +20,7 @@ export const navigateFromStack = (stack, screen, params) => {
     )
 }
 
-export const  goBack = () =>{
+export const goBack = () => {
     navigationRef.current && navigationRef.current.goBack();
 
 }

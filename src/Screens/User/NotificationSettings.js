@@ -35,6 +35,7 @@ const NotificationSettings = () => {
         <View style={{ flex: 1, backgroundColor: 'black' }}>
             <StatusBar
                 hidden={false}
+                backgroundColor={acolors.bgColor}
                 style='light'
             />
 
@@ -42,7 +43,7 @@ const NotificationSettings = () => {
                 <Header title="Notification Setting" />
 
 
-                <ScrollView contentContainerStyle={{paddingBottom:100}} style={{ marginTop: 50 }}>
+                <ScrollView contentContainerStyle={{ paddingBottom: 100 }} style={{ marginTop: 50 }}>
                     {
                         data.map(((v, i) => {
                             return (
@@ -52,9 +53,9 @@ const NotificationSettings = () => {
                                         trackColor={{ false: "white", true: 'grey' }}
                                         thumbColor={v.on ? acolors.primary : "grey"}
                                         ios_backgroundColor="#3e3e3e"
-                                        onValueChange={() => { 
+                                        onValueChange={() => {
                                             let arr = data
-                                            arr[i].on = !v.on 
+                                            arr[i].on = !v.on
                                             setData(arr)
                                             forceUpdate();
                                         }}

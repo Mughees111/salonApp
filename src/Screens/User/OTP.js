@@ -115,7 +115,8 @@ const OTP = () => {
         <View style={{ flex: 1 }}>
             <StatusBar
                 hidden={false}
-                backgroundColor={'#fff'}
+                backgroundColor={acolors.bgColor}
+                style='light'
             />
             <Image
                 style={{ position: 'absolute', width: "100%", height: "100%", }}

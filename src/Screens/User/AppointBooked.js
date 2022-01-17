@@ -9,27 +9,45 @@ import { Header } from '../../Components/Header';
 import Reviews from '../../Components/Reviews';
 import { ChatIcon, ArrowLeft, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, RattingStarIcon, SearchIcon } from '../../Components/Svgs';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import {  CommonActions } from '@react-navigation/native';
 
 
 
+const AppointBooked = (props) => {
 
-const AppointBooked = () => {
+    useEffect(() => {
+
+        const unsubscribe = props.navigation.addListener('blur', () => {
+            props.navigation.dispatch(state => {
+                const routes = state.routes.filter(r => r.name !== 'AppointBooked');
+                return CommonActions.reset({
+                    ...state,
+                    routes,
+                    index: 0,
+                });
+            });
+        })
+        return () => {
+            unsubscribe;
+        }
+    }, [])
 
 
     return (
         <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
                 style='light'
-                // translucent={false}
+                backgroundColor={acolors.bgColor}
+            // translucent={true}
             />
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ paddingHorizontal: 20, }}>
                     <Image
-                        style={{width:"50%",alignSelf:'center',resizeMode:'contain',marginTop:-50}}
+                        style={{ width: "50%", alignSelf: 'center', resizeMode: 'contain', marginTop: -50 }}
                         source={require('../../assets/done.gif')}
                     />
                     <Text style={{ color: acolors.primary, fontFamily: 'PMe', fontSize: 17, marginTop: -150, alignSelf: 'center' }}>Your Appointment has been booked</Text>
-                    <Text style={{ fontFamily: "PRe", fontSize: 14, color: '#FFFFFF', marginTop: 10, alignSelf: 'center' }}>8 Oct, 2021 17:00</Text>
+                    <Text style={{ fontFamily: "PRe", fontSize: 14, color: '#FFFFFF', marginTop: 10, alignSelf: 'center' }}>{props.route.params}</Text>
                 </View>
                 <MainButton
                     btnStyle={{ position: 'absolute', bottom: 50, width: "90%", alignSelf: 'center' }}
