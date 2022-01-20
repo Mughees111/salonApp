@@ -34,12 +34,12 @@ const NotificationSettings = () => {
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
             <StatusBar
-                hidden={false}
-                backgroundColor={acolors.bgColor}
                 style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
 
-            <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
+            <SafeAreaView style={{ marginTop: 10, width: "90%", alignSelf: 'center' }}>
                 <Header title="Notification Setting" />
 
 

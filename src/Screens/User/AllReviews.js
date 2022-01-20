@@ -38,9 +38,9 @@ const AllReviews = () => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-                // translucent={true}
+                translucent={false}
             />
-            <SafeAreaView style={{ flex: 1, height: Dimensions.get('window').height,marginTop:28 }}>
+            <SafeAreaView style={{ flex: 1, height: Dimensions.get('window').height,marginTop:10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: 'row',  justifyContent: 'space-between' }}>
                         <TouchableOpacity

@@ -307,15 +307,16 @@ const PaymentMethod = (props) => {
     return (
         <View style={{ flex: 1, backgroundColor: '#111111' }}>
             <StatusBar
-                style="light"
-                backgroundColor="#111111"
+                style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
             {_render_paypal()}
             {_render_stripe()}
 
-            <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
+            <SafeAreaView style={{ marginTop: 10, width: "90%", alignSelf: 'center' }}>
                 <Header title="Add Payment Method" />
                 <ScrollView>
                     <Text style={{ marginTop: 30, fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Please choose payment method</Text>

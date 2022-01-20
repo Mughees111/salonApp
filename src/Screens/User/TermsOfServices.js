@@ -58,11 +58,11 @@ const TermsOfServices = () => {
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
             <StatusBar
-                hidden={false}
-                backgroundColor={acolors.bgColor}
                 style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
-            <SafeAreaView style={{ flex: 1, marginTop: 30 }}>
+            <SafeAreaView style={{ flex: 1, marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Terms of Services" />
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>

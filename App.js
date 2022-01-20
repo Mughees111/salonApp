@@ -50,7 +50,7 @@ import { alertmsg, changeLoggedIn, loggedInObservable, navigateToPostNow, showms
 import { urls } from './src/utils/Api_urls';
 import { Provider } from './src/Context/DataContext';
 
-
+import * as Device from 'expo-device';
 
 const OnBoarding = createMaterialTopTabNavigator()
 const Stack = createStackNavigator()
@@ -211,7 +211,11 @@ export default function App() {
   const checkWithServer = (data) => {
     if (data) var token = data.token;
     else var token = "khali";
-    var body_data = { token: token };
+    var body_data = {
+      token: token,
+      // device_model: Device?.modelName ? Device?.modelName : null,
+      // device_manufactur: Device?.manufacturer ? Device?.manufacturer : null,
+    };
     doConsole(" I request @ " + urls.API + "check_login");
     doConsole(body_data);
     fetch(urls.API + 'check_login', {

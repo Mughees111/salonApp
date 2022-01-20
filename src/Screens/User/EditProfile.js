@@ -137,12 +137,12 @@ const EditProfile = () => {
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
             <StatusBar
-                hidden={false}
                 style='light'
-                backgroundColor='black'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
 
-            <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
+            <SafeAreaView style={{ marginTop: 10, width: "90%", alignSelf: 'center' }}>
                 <Header title="Edit Profile" />
 
                 <View style={{ marginTop: 20, alignSelf: 'center' }}>

@@ -46,13 +46,22 @@ const NearBy = () => {
 
     async function get_salons() {
 
+        setLoading(true)
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            Alert.alert('Permission to access location was denied');
+            alertRef.alertWithType('error', 'Error', 'You cannot see nearby salons without sharing your location');
+            setLoading(false)
             return;
         }
+        try {
+            var locationn = await Location.getCurrentPositionAsync({});
+        }
+        catch {
+            alertRef.alertWithType('error', 'Error', 'Please turn ON your location to see nearby salons')
+            setLoading(false)
+            return
+        }
 
-        var locationn = await Location.getCurrentPositionAsync({});
 
         retrieveItem('login_data')
             .then(data => {
@@ -64,7 +73,7 @@ const NearBy = () => {
                     }
                     console.log(postObj)
 
-                    setLoading(true)
+
                     apiRequest(postObj, 'get_nearby_salons')
                         .then(data => {
                             setLoading(false)
@@ -98,8 +107,9 @@ const NearBy = () => {
                 hidden={false}
                 style='light'
                 backgroundColor={acolors.bgColor}
+                translucent={false}
             />
-            <SafeAreaView style={{ flex: 1, marginTop: 35 }}>
+            <SafeAreaView style={{ flex: 1, marginTop: 15 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Near By" />
                     <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute', right: 10 }}>

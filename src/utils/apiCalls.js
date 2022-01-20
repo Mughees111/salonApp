@@ -29,8 +29,8 @@ async function doPost(body_data, url_plus) {
 export async function apiRequest(body_data, url_plus) {
   
   var url = urls.API;
-  doConsole(" I request @ " + urls.API + url_plus);
-  doConsole(body_data);
+  // doConsole(" I request @ " + urls.API + url_plus);
+  // doConsole(body_data);
   const configs = {
     method: 'POST',
     headers: {
@@ -40,14 +40,14 @@ export async function apiRequest(body_data, url_plus) {
     body: JSON.stringify(body_data),
   }
   // console.log('configs')
-  console.log(configs)
-  console.log(url + url_plus)
+  // console.log(configs)
+  // console.log(url + url_plus)
   return (
     fetch(url + url_plus, configs)
       .then((response) => response.json())
       // .then((response) => response.text())
       .then((responseJson) => {
-        console.log(responseJson)
+        // console.log(responseJson)
         return responseJson
       }).catch((error) => {
         console.log(error)

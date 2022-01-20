@@ -27,12 +27,12 @@ const EditPaymentMethod = () => {
     return (
         <View style={{ flex: 1, backgroundColor: '#111111' }}>
             <StatusBar
-                hidden={false}
-                style="light"
-                backgroundColor="#111111"
+                style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
 
-            <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
+            <SafeAreaView style={{ marginTop: 15, width: "90%", alignSelf: 'center' }}>
                 <Header title="Payment Method" />
                 <ScrollView>
                     <Text style={{ marginTop: 30, fontFamily: 'PRe', fontSize: 16, color: acolors.white }}>Here are your payment methods</Text>

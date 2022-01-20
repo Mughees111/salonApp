@@ -114,16 +114,16 @@ const AppointSchedule = () => {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
-                hidden={false}
                 backgroundColor={acolors.bgColor}
                 style='light'
+                translucent={false}
             />
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
-            <SafeAreaView style={{ flex: 1, marginTop: 25 }}>
+            <SafeAreaView style={{ flex: 1, marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Appointment" />
                     <Tabs />
@@ -140,10 +140,10 @@ const AppointSchedule = () => {
                                         {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
-                                            // onPress={() => navigate('SalonDetails')}
+                                            onPress={() => console.log(item)}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch' }}
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
                                                 source={{ uri: item.sal_profile_pic }
                                                     // require('../../assets/salonImg1.png')
                                                 }
@@ -271,7 +271,7 @@ const AppointSchedule = () => {
                                             // onPress={() => navigate('SalonDetails')}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch' }}
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
                                                 source={{ uri: item.sal_profile_pic }
                                                     // require('../../assets/salonImg1.png')
                                                 }
@@ -448,10 +448,10 @@ const AppointSchedule = () => {
                                             // onPress={() => navigate('SalonDetails')}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch' }}
-                                                source={{ uri: item.sal_profile_pic }
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
+                                                source={{ uri: item.sal_profile_pic }}
                                                     // require('../../assets/salonImg1.png')
-                                                }
+                                              
                                             />
                                             <View style={{ marginLeft: 10, flex: 1 }}>
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
@@ -512,7 +512,7 @@ const AppointSchedule = () => {
                 </View>
             </SafeAreaView >
 
-        </View >
+        </SafeAreaView >
     )
 }
 

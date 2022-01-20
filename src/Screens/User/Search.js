@@ -90,9 +90,9 @@ const SearchScreen = (props) => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-                translucent={true}
+                translucent={false}
             />
-            <SafeAreaView style={{ marginTop: 28 }}>
+            <SafeAreaView style={{ marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
                         <TouchableOpacity

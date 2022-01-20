@@ -91,12 +91,12 @@ const Favourites = () => {
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
             <StatusBar
-                hidden={false}
                 style='light'
                 backgroundColor={acolors.bgColor}
+                translucent={false}
             />
 
-            <SafeAreaView style={{ marginTop: 35, width:"95%",alignSelf:'center'}}>
+            <SafeAreaView style={{ marginTop: 10, width:"95%",alignSelf:'center'}}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Favorites" />
                     <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are your favorite saloons</Text>

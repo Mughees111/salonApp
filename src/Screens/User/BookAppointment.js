@@ -198,12 +198,12 @@ const BookAppointment = (props) => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-            // translucent={true}
+                translucent={false}
             />
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
-            <SafeAreaView style={{ marginTop: 25 }}>
+            <SafeAreaView style={{ marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Header title="Book Appointment" />
                     <ScrollView contentContainerStyle={{ paddingBottom: 120 }} >

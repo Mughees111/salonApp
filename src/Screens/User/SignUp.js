@@ -17,7 +17,7 @@ import DropdownAlert from 'react-native-dropdownalert';
 import { validateEmail, doConsole, storeItem } from '../../utils/functions';
 import { apiRequest, doPost } from '../../utils/apiCalls';
 
-
+import * as Device from 'expo-device';
 
 var alertRef;
 const SignUp = () => {
@@ -58,7 +58,13 @@ const SignUp = () => {
 
     const goSignup = async () => {
         setLoading(true)
-        var dbData = { email, username, password };
+        var dbData = {
+            email,
+            username,
+            password,
+            device_model: Device?.modelName ? Device?.modelName : null,
+            device_manufactur: Device?.manufacturer ? Device?.manufacturer : null
+        };
         doConsole(" I request @ " + urls.API + "signup");
         doConsole(dbData);
 
@@ -109,9 +115,9 @@ const SignUp = () => {
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
             <StatusBar
-                hidden={false}
-                backgroundColor={acolors.bgColor}
                 style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
             <Image
                 style={{ position: 'absolute', width: "100%", height: "100%", }}

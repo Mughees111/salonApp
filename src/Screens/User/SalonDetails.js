@@ -67,15 +67,15 @@ const SalonDetails = (props) => {
     const keyExtractor = ((item, index) => index.toString())
 
     return (
-        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
 
             <StatusBar
                 style='light'
-                translucent={true}
                 backgroundColor={acolors.bgColor}
+                translucent={false}
             />
 
             <Image
@@ -99,7 +99,7 @@ const SalonDetails = (props) => {
                 images={images}
             /> */}
 
-            <SafeAreaView style={{ position: 'absolute', top: 35, }}>
+            <SafeAreaView style={{ position: 'absolute', top: 10, }}>
                 <View style={{ paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', width: Dimensions.get('window').width, }}>
                     <TouchableOpacity
                         onPress={() => goBack()}
@@ -167,7 +167,9 @@ const SalonDetails = (props) => {
                         {
                             params?.sal_hours?.map((v, i) => {
                                 return (
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, paddingBottom: 5, paddingHorizontal: 2, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+                                    <View
+                                        key={i}
+                                        style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, paddingBottom: 5, paddingHorizontal: 2, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
                                         <Text style={styles.simpleText}>{daysArr[i]}</Text>
                                         <View style={{}}>
                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -193,6 +195,7 @@ const SalonDetails = (props) => {
                                 if (i > 3) return null;
                                 return (
                                     <TouchableOpacity
+                                        key={i}
                                         onPress={() => {
                                             // doConsole(params)
                                             navigate('SeeAllServices', params)
@@ -281,7 +284,8 @@ const SalonDetails = (props) => {
                         <MainButton
                             btnStyle={{ marginTop: 15 }}
                             onPress={() => {
-                                navigate('SeeAllServices', params)}
+                                navigate('SeeAllServices', params)
+                            }
                                 // navigate('BookAppointment')}
                             }
                             text="Book Appointment"
@@ -291,7 +295,7 @@ const SalonDetails = (props) => {
                 </ScrollView>
             </SafeAreaView>
 
-        </View >
+        </SafeAreaView >
     )
 }
 

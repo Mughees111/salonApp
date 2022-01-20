@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native'
 import { navigate } from '../../../Navigations';
 import { ArrowRight, FbIcon, GoogleIcon, LOGO } from '../../Components/Svgs';
@@ -10,12 +10,14 @@ import PrivacyPicker from '../../Components/PrivacyPicker';
 import { MainButton } from '../../Components/Buttons';
 
 import Loader from '../../utils/Loader';
-import { validateEmail, doConsole ,storeItem} from '../../utils/functions';
+import { validateEmail, doConsole, storeItem } from '../../utils/functions';
 
 import { changeLoggedIn } from '../../../Common';
 import DropdownAlert from 'react-native-dropdownalert';
 import { urls } from '../../utils/Api_urls';
 import { apiRequest } from '../../utils/apiCalls';
+
+import * as Device from 'expo-device';
 
 
 var alertRef;
@@ -46,12 +48,17 @@ const SignIn = () => {
 
     const goSignup = async () => {
         setLoading(true)
-        var dbData = { email, password };
+        var dbData = {
+            email,
+            password,
+            device_model: Device?.modelName ? Device?.modelName : null,
+            device_manufactur: Device?.manufacturer ? Device?.manufacturer : null
+        };
         doConsole(" I request @ " + urls.API + "login");
         apiRequest(dbData, "login")
             .then(data => {
                 if (data.action == "success") {
-                    
+
                     storeItem("login_data", data.data).then(() => {
                         storeItem("is_guest", '0')
                         changeLoggedIn.changeNow(1);
@@ -68,7 +75,7 @@ const SignIn = () => {
             .catch(err => {
                 doConsole(err)
                 setLoading(false)
-                alertRef.alertWithType("error",urls.error_title,urls.error);
+                alertRef.alertWithType("error", urls.error_title, urls.error);
             })
 
         // const { isError, data } = await doPost(dbData, "login");
@@ -82,15 +89,19 @@ const SignIn = () => {
         // }
     }
 
+    useEffect(() => {
+        console.log(Device)
+    }, [])
+
 
 
 
     return (
         <View style={{ flex: 1 }}>
             <StatusBar
-                hidden={false}
-                backgroundColor={acolors.bgColor}
                 style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
             <Image
                 style={{ position: 'absolute', width: "100%", height: "100%", }}

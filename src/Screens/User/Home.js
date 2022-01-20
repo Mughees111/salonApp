@@ -1,7 +1,7 @@
 
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useState, useEffect, useContext } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, Alert } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
 import { navigate } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
@@ -20,7 +20,7 @@ var alertRef;
 const Home = () => {
 
     const forceUpdate = useForceUpdate();
-    const { state, setUserGlobal ,setUserLocationGlobal} = useContext(Context);
+    const { state, setUserGlobal, setUserLocationGlobal } = useContext(Context);
     const [loading, setLoading] = useState(false);
 
     const [tabs, setTabs] = useState({ men: true, women: false })
@@ -33,50 +33,79 @@ const Home = () => {
     const [lat, setLat] = useState('')
     const [lng, setLng] = useState('')
 
+    const [firstHeading, setFirstHeading] = useState('Nearest To You');
+
 
     async function get_salons() {
 
         setLoading(true)
+
         let { status } = await Location.requestForegroundPermissionsAsync();
+
         if (status !== 'granted') {
-            Alert.alert('Permission to access location was denied');
-            return;
+            setFirstHeading('All Salons')
+            // Alert.alert('Permission to access location was denied');
+            alertRef.alertWithType('warn', '', 'You cannot see nearby salons without sharing your location');
+            // return;
+        }
+        else {
+            setFirstHeading('Nearest To You')
+        }
+        var lat;
+        var lng;
+        if (state?.userLocation?.coords?.latitude) {
+            console.log('yes i have user location in state');
+            lat = state.userLocation?.coords?.latitude
+            lng = state.userLocation?.coords?.longitude;
+        }
+        else {
+            try {
+                var locationn = await Location.getCurrentPositionAsync({});
+            }
+            catch { }
         }
 
-        var locationn = await Location.getCurrentPositionAsync({});
-        setUserLocationGlobal(locationn)
-
+        if (locationn) {
+            lat = locationn?.coords?.latitude;
+            lng = locationn?.coords?.longitude;
+            setUserLocationGlobal(locationn)
+        }
+        
         retrieveItem('login_data')
             .then(data => {
                 if (data?.token) {
+                    setUserGlobal(data)
                     const postObj = {
-                        lat: locationn?.coords?.latitude,
-                        lng: locationn?.coords?.longitude,
+                        lat,
+                        lng,
                         token: data.token
                     }
-                    console.log(postObj)
-
-                    
-                    apiRequest(postObj, 'get_salons')
-                        .then(data => {
-                            setLoading(false)
-                            if (data.action == 'success') {
-                                setMensData(data.data.mens);
-                                setWomensData(data.data.womens);
-                                setRecommended(data.data.setRecommended)
-                                forceUpdate();
-                            }
-                            else {
-                                alertRef.alertWithType('error', 'Error', data.error);
-                            };
-                        })
-                        .catch(err => {
-                            setLoading(false)
-                        })
+                    ApiRequestForSalon(postObj);
                 };
             });
+
     }
 
+    function ApiRequestForSalon(postObj) {
+        // console.log('postObj in apiRe')
+        // console.log(postObj)
+        apiRequest(postObj, 'get_salons')
+            .then(data => {
+                setLoading(false)
+                if (data.action == 'success') {
+                    setMensData(data.data.mens);
+                    setWomensData(data.data.womens);
+                    setRecommended(data.data.setRecommended)
+                    forceUpdate();
+                }
+                else {
+                    alertRef.alertWithType('error', 'Error', data.error);
+                };
+            })
+            .catch(err => {
+                setLoading(false)
+            })
+    }
 
     const keyExtractor = ((item, index) => index.toString())
 
@@ -85,6 +114,7 @@ const Home = () => {
             .then(data => {
                 if (data) {
                     setUserGlobal(data)
+                    forceUpdate();
                 }
             })
         get_salons()
@@ -123,12 +153,12 @@ const Home = () => {
                         style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-                    <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
                         <RattingStarIcon />
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance + " Km"} </Text>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance != '0.00' && item.distance + " Km"} </Text>
                     </View>
 
                 </View>
@@ -141,12 +171,11 @@ const Home = () => {
     }, [])
 
     return (
-        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
-                hidden={false}
                 backgroundColor={acolors.bgColor}
                 style='light'
-                translucent={true}
+                translucent={false}
             />
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
@@ -159,7 +188,7 @@ const Home = () => {
                 source={require('../../assets/HomeMask1.png')}
                 style={{ width: "100%", resizeMode: 'stretch', position: 'absolute', top: 0 }}
             />
-            <SafeAreaView style={{ position: 'absolute', top: 28 }}>
+            <SafeAreaView style={{ position: 'absolute', top: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello {state?.userData?.username},</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -234,7 +263,7 @@ const Home = () => {
                 </View>
                 <ScrollView contentContainerStyle={{ paddingBottom: 400 }} >
                     <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Nearest To You</Text>
+                        <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>{firstHeading}</Text>
                         <TouchableOpacity>
                             <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
                         </TouchableOpacity>
@@ -305,7 +334,7 @@ const Home = () => {
             </View>
 
 
-        </View >
+        </SafeAreaView >
     )
 }
 

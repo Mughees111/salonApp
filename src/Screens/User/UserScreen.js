@@ -57,11 +57,11 @@ const UserScreen = () => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
-                hidden={false}
-                backgroundColor={acolors.bgColor}
                 style='light'
+                backgroundColor={acolors.bgColor}
+                translucent={false}
             />
-            <View style={{ width: "100%", height: 200, marginTop: 30 }}>
+            <View style={{ width: "100%", height: 200, marginTop: 10 }}>
 
                 <Image
                     style={{ width: "100%", resizeMode: 'contain', height: "100%", borderRadius: 15 }}
@@ -130,9 +130,10 @@ const UserScreen = () => {
                                     if (data.token) {
                                         setLoading(true)
                                         storeItem('login_data', '')
+                                        state.userData = [];
                                         apiRequest({ token: data.token }, 'logout')
                                             .then(data => {
-                                                console.log(data)
+                                                // console.log(data)
                                                 setLoading(false)
                                                 if (data.action == 'success') {
                                                     changeLoggedIn.changeNow(2);

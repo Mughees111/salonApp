@@ -15,10 +15,10 @@ const AddCardDetails = () => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-                translucent={true}
+                translucent={false}
             />
 
-            <SafeAreaView style={{ marginTop: 35, width: "90%", alignSelf: 'center' }}>
+            <SafeAreaView style={{ marginTop: 15, width: "90%", alignSelf: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <TouchableOpacity
                         onPress={() => goBack()}

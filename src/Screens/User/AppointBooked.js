@@ -38,7 +38,7 @@ const AppointBooked = (props) => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-            // translucent={true}
+                translucent={false}
             />
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ paddingHorizontal: 20, }}>

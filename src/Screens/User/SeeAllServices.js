@@ -99,17 +99,17 @@ const SeeAllServices = (props) => {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-                translucent={true}
+                translucent={false}
             />
             {loading && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
 
-            <SafeAreaView style={{ flex: 1, height: Dimensions.get('window').height, marginTop: 28 }}>
+            <SafeAreaView style={{ flex: 1, height: Dimensions.get('window').height, marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <TouchableOpacity
@@ -156,7 +156,7 @@ const SeeAllServices = (props) => {
 
 
             </SafeAreaView>
-        </View>
+        </SafeAreaView>
 
 
     )

@@ -32,9 +32,9 @@ const Categories = () => {
             <StatusBar
                 style='light'
                 backgroundColor={acolors.bgColor}
-                // translucent={true}
+                translucent={false}
             />
-            <SafeAreaView style={{ flex: 1 ,marginTop:30}}>
+            <SafeAreaView style={{ flex: 1 ,marginTop:10}}>
                 <View style={{ paddingHorizontal: 20, }}>
                     <Header title="Categories" />
                     <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are all the categories</Text>
