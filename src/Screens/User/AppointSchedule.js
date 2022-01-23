@@ -31,7 +31,7 @@ const AppointSchedule = () => {
     const [pendings, setPendings] = useState([]);
     const [scheduled, setScheduled] = useState([]);
     const [history, setHistory] = useState([]);
-    const [ispublic, setispublic] = useState(1)
+    const [ispublic, setispublic] = useState(0)
 
     function getAppointments() {
 
@@ -143,7 +143,7 @@ const AppointSchedule = () => {
                                             onPress={() => console.log(item)}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch', borderRadius: 12 }}
                                                 source={{ uri: item.sal_profile_pic }
                                                     // require('../../assets/salonImg1.png')
                                                 }
@@ -271,7 +271,7 @@ const AppointSchedule = () => {
                                             // onPress={() => navigate('SalonDetails')}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch', borderRadius: 12 }}
                                                 source={{ uri: item.sal_profile_pic }
                                                     // require('../../assets/salonImg1.png')
                                                 }
@@ -448,10 +448,10 @@ const AppointSchedule = () => {
                                             // onPress={() => navigate('SalonDetails')}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
-                                                style={{ height: 85, width: "28%", resizeMode: 'stretch',borderRadius:12 }}
+                                                style={{ height: 85, width: "28%", resizeMode: 'stretch', borderRadius: 12 }}
                                                 source={{ uri: item.sal_profile_pic }}
-                                                    // require('../../assets/salonImg1.png')
-                                              
+                                            // require('../../assets/salonImg1.png')
+
                                             />
                                             <View style={{ marginLeft: 10, flex: 1 }}>
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
@@ -496,6 +496,20 @@ const AppointSchedule = () => {
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Status</Text>
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.app_status}</Text>
                                         </View>
+                                        {
+                                            item.app_status == 'cancelled' &&
+                                            <>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                                    <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Cancelled By</Text>
+                                                    <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.cancelled_by == 'user' ? "You" : item.cancelled_by}</Text>
+                                                </View>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+                                                    <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', width: "40%" }}>Reason</Text>
+                                                    <Text numberOfLines={4} style={{ textAlign: 'right', flexWrap: 'wrap', width: "60%", fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.cancelled_reason}</Text>
+
+                                                </View>
+                                            </>
+                                        }
 
                                         <TouchableOpacity
                                             // onPress={() => navigateFromStack('HomeStack', 'SalonDetails')}

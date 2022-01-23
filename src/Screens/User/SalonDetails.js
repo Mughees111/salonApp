@@ -24,6 +24,7 @@ const SalonDetails = (props) => {
     const { state, setUserGlobal } = useContext(Context);
     const [loading, setLoading] = useState(false);
 
+    const [salImgs, setSalImgs] = useState([]);
 
     const params = props.route.params;
     const [fav, setFav] = useState(params?.is_fav)
@@ -64,8 +65,37 @@ const SalonDetails = (props) => {
             })
     }
 
+
+    function get_salon_pics() {
+        
+        const postObj = {
+            sal_id : params?.sal_id,
+            token : state.userData.token
+        }
+        apiRequest(postObj, 'get_salon_pics')
+            .then(data => {
+                setLoading(false)
+                if (data.action == 'success') {
+                    setSalImgs(data.imgs);
+                    params.sal_services = data.sal_services
+                    forceUpdate();
+                }
+                else {
+                    alertRef.alertWithType('error', 'Error', data.error);
+                };
+            })
+            .catch(err => {
+                setLoading(false)
+            })
+    }
+
+
     const keyExtractor = ((item, index) => index.toString())
 
+
+    useEffect(()=>{
+        get_salon_pics();
+    },[])
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             {loading && <Loader />}
@@ -174,7 +204,7 @@ const SalonDetails = (props) => {
                                         <View style={{}}>
                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: acolors.primary }}></View>
-                                                <Text style={[styles.simpleText, { marginLeft: 20 }]}>{v[0] ? v[0] : null} {v[1]?.length ? "-" + v[1] : null} </Text>
+                                                <Text style={[styles.simpleText, { marginLeft: 20 }]}>{v[0] ? v[0] : null} {v[0] != 'closed' && v[1]?.length ? "-" + v[1] : null} </Text>
                                             </View>
                                         </View>
                                     </View>
@@ -232,19 +262,21 @@ const SalonDetails = (props) => {
                             keyExtractor={keyExtractor}
                             showsVerticalScrollIndicator={false}
                             horizontal={true}
-                            data={[
+                            data={salImgs
+                                // [
                                 // { img: require('../../assets/salonImg1.png') },
                                 // { img: require('../../assets/salonImg3.png') },
                                 // { img: require('../../assets/salonImg2.png') },
                                 // { img: require('../../assets/salonImg1.png') },
                                 // { img: require('../../assets/salonImg2.png') },
                                 // { img: require('../../assets/salonImg3.png') },
-                            ]}
+                                // ]
+                            }
 
                             renderItem={({ item }) => (
                                 <Image
                                     style={{ width: 79, height: 69, borderRadius: 5, marginLeft: 10, borderRadius: 8 }}
-                                    source={item.img}
+                                    source={{ uri: item.img }}
                                 />
                             )}
                         />
