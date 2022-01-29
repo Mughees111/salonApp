@@ -19,13 +19,41 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mughees1512.salonApp"
+      "bundleIdentifier": "com.mughees1512.salonApp",
+      "config" :{
+        "googleSignIn" : {
+          "reservedClientId" :"com.googleusercontent.apps.980626479473-0ebl3ruro1hkbuc2com4pmff0bmlttl3"
+        }
+      },
+      "googleServicesFile" :"./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
+      }
     },
     "android": {
-      "package": "com.mughees1512.salonApp"
+      "package": "com.mughees1512.salonApp",
+      "googleServicesFile" : "./google-services.json",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU"
+        }
+      }
+      
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-facebook",
+      "expo-google-sign-in"
+    ]
   }
 }

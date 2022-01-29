@@ -1,14 +1,11 @@
-
 export const urls = {
-  // API: "http://192.168.1.107/cauaffBE/api/",
-  // PHP_API: "http://192.168.1.107/cauaffBE/",
-  // Image_Uri: "http://192.168.1.107/cauaffBE/api/",
+  // API: "http://192.168.18.87/cauaffBE/api/",
+  // PHP_API: "http://192.168.18.87/cauaffBE/",
+  // Image_Uri: "http://192.168.18.87/cauaffBE/api/",
 
   API: "https://cauaff.fictiondevelopers.com/api/",
   PHP_API: "https://cauaff.fictiondevelopers.com",
   Image_Uri: "https://cauaff.fictiondevelopers.com/api/",
-
-
 
   //... more colors here
   MARGIN: false,

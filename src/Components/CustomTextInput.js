@@ -14,6 +14,7 @@ const CustomTextInput = ({ style, onChangeText, placeholder, placeholderTextColo
             autoFocus={autoFocus}
             keyboardType={keyboardType}
             keyboardAppearance={keyboardAppearance ? keyboardAppearance : "default"}
+            
         // {...props}
         />
     )

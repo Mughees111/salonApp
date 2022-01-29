@@ -136,8 +136,8 @@ const AppointSchedule = () => {
                             renderItem={({ item, index }) => {
                                 // var services = item.app_services.split(",");
                                 return (
-                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
-                                        {/* <View style={{ paddingHorizontal: 20 }}> */}
+                                                        <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
+                                      {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
                                             onPress={() => console.log(item)}

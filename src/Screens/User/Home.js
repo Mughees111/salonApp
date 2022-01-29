@@ -35,6 +35,9 @@ const Home = () => {
 
     const [firstHeading, setFirstHeading] = useState('Nearest To You');
 
+    const [shortAddress, setShortAddress] = useState('Loading');
+    const production = false;
+    const MAPS_KEY = production ? "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
 
     async function get_salons() {
 
@@ -55,14 +58,39 @@ const Home = () => {
         var lng;
         if (state?.userLocation?.coords?.latitude) {
             console.log('yes i have user location in state');
-            lat = state.userLocation?.coords?.latitude
+            lat = state.userLocation?.coords?.latitude;
             lng = state.userLocation?.coords?.longitude;
         }
         else {
             try {
                 var locationn = await Location.getCurrentPositionAsync({});
             }
-            catch { }
+            catch {
+                try {
+                    var locationn = await Location.getLastKnownPositionAsync({});
+                }
+                catch {
+                    setFirstHeading('All Salons')
+                    alertRef.alertWithType('warn', '', 'Error while fetching your location');
+                }
+            }
+        }
+        if (shortAddress == 'Loading' || shortAddress == '' ) {
+            let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${MAPS_KEY}`;
+            console.log(url)
+            fetch(url)
+                .then(data => data.json())
+                .then(data => {
+                    if (data.results) {
+                        makeShortTitle(data.results[0].address_components);
+                    }
+                    else {
+                        setShortAddress('');
+                    }
+                })
+                .catch(err => {
+                    setShortAddress('');
+                })
         }
 
         if (locationn) {
@@ -70,7 +98,7 @@ const Home = () => {
             lng = locationn?.coords?.longitude;
             setUserLocationGlobal(locationn)
         }
-        
+
         retrieveItem('login_data')
             .then(data => {
                 if (data?.token) {
@@ -105,6 +133,32 @@ const Home = () => {
             .catch(err => {
                 setLoading(false)
             })
+    }
+
+    function makeShortTitle(address_components) {
+        var title = ""
+        var found = false
+        console.log(address_components)
+        address_components?.forEach((e) => {
+            if (e["types"]?.includes("locality")) {
+                found = true
+                title = e["long_name"]
+            }
+
+            if (e["types"]?.includes("country")) {
+                title = title + ', ' + e["long_name"]
+            }
+        })
+
+        if (found) {
+            console.log(`short title: ${title}`)
+            setShortAddress(title);
+            forceUpdate();
+            return title
+        }
+        else setShortAddress('');
+        console.log(`couldn't make short title`)
+        return r?.results[0]?.formatted_address ?? "Unknown"
     }
 
     const keyExtractor = ((item, index) => index.toString())
@@ -192,10 +246,14 @@ const Home = () => {
                 <View style={{ paddingHorizontal: 20 }}>
                     <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello {state?.userData?.username},</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
-                            <LocationIcon />
-                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: acolors.white, marginLeft: 5 }}>Alaska, US</Text>
-                        </TouchableOpacity>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
+                            {shortAddress ?
+                                <LocationIcon />
+                                : null
+                            }
+                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: acolors.white, marginLeft: 5 }}>{shortAddress}</Text>
+                        </View>
                         <View style={{ marginTop: -15, flexDirection: 'row', alignItems: 'center' }}>
                             <TouchableOpacity
                                 onPress={() => navigate('Notifications')}

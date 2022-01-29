@@ -44,7 +44,6 @@ const PrivacyPicker = (props: Props) => {
   const do_filter = (str) => {
     str = str.toLowerCase();
     var all = data;
-
     var filtered_data = all.filter((v) => {
       var value = v.title.toLowerCase();
       return value.includes(str) ? true : false

@@ -33,23 +33,16 @@ const SignIn = () => {
 
     const doNext = () => {
 
-        if (!validateEmail(email)) {
+        var e = email;
+        e = e.trim();
+        if (!validateEmail(e)) {
             alertRef.alertWithType("error", "Error", "Please provide a valid email address");
             return;
         }
 
-        // if (password.length < 8) {
-        //     alertRef.alertWithType("error", "Error", "Please provide at least 8 characters as your password");
-
-        //     return;
-        // }
-        goSignup()
-    }
-
-    const goSignup = async () => {
         setLoading(true)
         var dbData = {
-            email,
+            email : e,
             password,
             device_model: Device?.modelName ? Device?.modelName : null,
             device_manufactur: Device?.manufacturer ? Device?.manufacturer : null
@@ -77,6 +70,10 @@ const SignIn = () => {
                 setLoading(false)
                 alertRef.alertWithType("error", urls.error_title, urls.error);
             })
+
+    }
+
+    const goSignup = async () => {
 
         // const { isError, data } = await doPost(dbData, "login");
         // console.log(isError)
@@ -131,6 +128,7 @@ const SignIn = () => {
                             onChangeText={setPassword}
                             placeholder="Password"
                             style={{ marginTop: 15, }}
+                            secureTextEntry={true}
                         />
                         <TouchableOpacity
                             onPress={() => navigate('ForgetPass')}
@@ -146,7 +144,7 @@ const SignIn = () => {
                                 //  navigate('BottomTabs') 
                             }}
                         />
-                        <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 15, fontFamily: 'PMe' }}>or continue with</Text>
+                        {/* <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 15, fontFamily: 'PMe' }}>or continue with</Text>
                         <View style={{ alignSelf: 'center', flexDirection: 'row', marginTop: 15 }}>
                             <TouchableOpacity style={{ width: 92, height: 48, borderWidth: 1, borderColor: acolors.white, borderRadius: 56, alignItems: 'center', justifyContent: 'center', }}>
                                 <FbIcon />
@@ -160,7 +158,7 @@ const SignIn = () => {
                             onPress={() => navigate('SignUp')}
                         >
                             <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Don’t have an account? Sign Up</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
 
