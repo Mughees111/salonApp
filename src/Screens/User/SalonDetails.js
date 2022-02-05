@@ -25,6 +25,8 @@ const SalonDetails = (props) => {
     const [loading, setLoading] = useState(false);
 
     const [salImgs, setSalImgs] = useState([]);
+    const [sal_reviews, setSalReviews] = useState([]);
+    const [sal_ratings, setSalRatings] = useState('');
 
     const params = props.route.params;
     const [fav, setFav] = useState(params?.is_fav)
@@ -67,17 +69,22 @@ const SalonDetails = (props) => {
 
 
     function get_salon_pics() {
-        
+
         const postObj = {
-            sal_id : params?.sal_id,
-            token : state.userData.token
+            sal_id: params?.sal_id,
+            token: state.userData.token
         }
+        setLoading(true)
+        doConsole(postObj)
         apiRequest(postObj, 'get_salon_pics')
             .then(data => {
                 setLoading(false)
                 if (data.action == 'success') {
                     setSalImgs(data.imgs);
                     params.sal_services = data.sal_services
+                    doConsole(data)
+                    setSalReviews(data.sal_reviews);
+                    setSalRatings(data.sal_ratings);
                     forceUpdate();
                 }
                 else {
@@ -93,9 +100,24 @@ const SalonDetails = (props) => {
     const keyExtractor = ((item, index) => index.toString())
 
 
-    useEffect(()=>{
+    useEffect(() => {
         get_salon_pics();
-    },[])
+    }, [])
+
+    const MakeReview = ({ number }) => {
+        console.log(number)
+        var stars = [];
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                // <View>
+                <RattingStarIcon width={16} height={15} color={i > number ? "grey" : null} />
+                // </View>
+            )
+        }
+        return <View style={{ flexDirection: 'row' }}>{stars}</View>
+
+    }
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
             {loading && <Loader />}
@@ -171,10 +193,10 @@ const SalonDetails = (props) => {
                             </Text>
                             <Text style={{ fontFamily: 'PRe', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 3 }}>{params?.sal_address}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5</Text>
+                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{params?.sal_ratings}</Text>
                                 <RattingStarIcon />
                                 <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
-                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>5.5 Km</Text>
+                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{params?.distance} mi</Text>
                                 <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row' }}>
                                     <TouchableOpacity style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                         <MsgIcon />
@@ -252,26 +274,17 @@ const SalonDetails = (props) => {
                         <ServicesView title="Oil Treatment" /> */}
 
 
-                        <Image
+                        {/* <Image
                             style={{ width: "100%", resizeMode: 'stretch', marginTop: 20 }}
                             source={require('../../assets/map.png')}
-                        />
+                        /> */}
                         <Text style={styles.headingText}>Photos</Text>
                         <FlatList
                             style={{ marginTop: 10 }}
                             keyExtractor={keyExtractor}
                             showsVerticalScrollIndicator={false}
                             horizontal={true}
-                            data={salImgs
-                                // [
-                                // { img: require('../../assets/salonImg1.png') },
-                                // { img: require('../../assets/salonImg3.png') },
-                                // { img: require('../../assets/salonImg2.png') },
-                                // { img: require('../../assets/salonImg1.png') },
-                                // { img: require('../../assets/salonImg2.png') },
-                                // { img: require('../../assets/salonImg3.png') },
-                                // ]
-                            }
+                            data={salImgs}
 
                             renderItem={({ item }) => (
                                 <Image
@@ -280,36 +293,44 @@ const SalonDetails = (props) => {
                                 />
                             )}
                         />
-                        <Text style={{ marginTop: 20, fontSize: 17, fontFamily: 'PMe', color: 'white' }}>Reviews ({params?.sal_reviews})</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20, }}>
+                            <Text style={{ fontSize: 17, fontFamily: 'PMe', color: 'white' }}>Reviews ({sal_reviews.length})</Text>
+                            {sal_reviews.length > 0 &&
+                                < View style={{ position: 'absolute', right: 0, }}>
+                                    <MakeReview width={20} number={sal_ratings} />
+                                </View>
+                            }
+                        </View>
                         {
-                            params?.sal_reviews > 0 &&
+                            sal_reviews.length > 0 &&
                             <>
-                                <Reviews
-                                    name="William David:"
-                                    image={require("../../assets/reviewImg1.png")}
-                                    review="Lorem ipsum dolor sit , consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut"
-                                    rattings="5.0"
-                                />
-                                <Reviews
-                                    name="Richard Thomas"
-                                    image={require("../../assets/reviewImg1.png")}
-                                    review="Lorem ipsum dolor sit , consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut"
-                                    rattings="4.5"
-                                />
-                                <Reviews
-                                    name="Xquenda Cuauhtémoc"
-                                    image={require("../../assets/reviewImg1.png")}
-                                    review="Lorem ipsum dolor sit , consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut"
-                                    rattings="4.8"
-                                    last={true}
-                                />
+                                {
+                                    sal_reviews?.map((v, i) => {
+                                        if (i > 3) {
+                                            return null
+                                        }
+
+                                        return (
+                                            <Reviews
+                                                key={i}
+                                                name={v.username}
+                                                image={v.profile_pic}
+                                                review={v.rev_text}
+                                                rattings={v.rev_rating}
+                                                rev_datetime={v.rev_datetime}
+                                            />
+                                        )
+                                    })
+                                }
+
+
                                 <TouchableOpacity
                                     onPress={() => {
                                         console.log('pressed')
-                                        navigate('AllReviews')
+                                        navigate('AllReviews', sal_reviews)
                                     }}
                                 >
-                                    <Text style={{ color: acolors.primary, fontFamily: 'PRe', fontSize: 12, }}>View all reviews</Text>
+                                    <Text style={{ color: acolors.primary, fontFamily: 'PRe', fontSize: 12, marginTop: 10 }}>View all reviews</Text>
                                 </TouchableOpacity>
                             </>
                         }

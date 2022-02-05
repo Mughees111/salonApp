@@ -263,7 +263,6 @@ export default function App() {
 
 
   useEffect(() => {
-
     checkLogin()
   }, [])
 

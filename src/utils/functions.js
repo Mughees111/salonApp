@@ -252,8 +252,8 @@ async function do_update_dp(url, response, type__, userToken, url_plus) {
 
   data.append("photo", {
     name: _real_name,
-    type: Platform.OS === "android" ? "image/jpeg" : response.type,
-    uri: Platform.OS === "android" ? response.uri : response.uri?.replace("file://", "")
+    type: Platform.OS === "android" ? "image/jpeg" : response?.type,
+    uri: Platform.OS === "android" ? response?.uri : response?.uri?.replace("file://", "")
   });
   data.append("token", userToken);
   console.log("this is wat I'm submitting");

@@ -9,7 +9,7 @@ import { ChatIcon, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, 
 
 import { useFocusEffect } from '@react-navigation/native';
 import { apiRequest } from '../../utils/apiCalls';
-import { retrieveItem, useForceUpdate, } from '../../utils/functions';
+import { retrieveItem, } from '../../utils/functions';
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
@@ -17,6 +17,11 @@ import { Context } from '../../Context/DataContext';
 import * as Location from 'expo-location';
 
 var alertRef;
+const useForceUpdate = () => {
+    const [, updateState] = useState();
+    return useCallback(() => updateState({}), []);
+}
+
 const Home = () => {
 
     const forceUpdate = useForceUpdate();
@@ -41,19 +46,11 @@ const Home = () => {
 
     async function get_salons() {
 
-        setLoading(true)
-
-        let { status } = await Location.requestForegroundPermissionsAsync();
-
-        if (status !== 'granted') {
-            setFirstHeading('All Salons')
-            // Alert.alert('Permission to access location was denied');
-            alertRef.alertWithType('warn', '', 'You cannot see nearby salons without sharing your location');
-            // return;
+        if (mensData.length < 1 || womensData.length < 1) {
+            console.log(mensData.length)
+            setLoading(true)
         }
-        else {
-            setFirstHeading('Nearest To You')
-        }
+
         var lat;
         var lng;
         if (state?.userLocation?.coords?.latitude) {
@@ -62,6 +59,17 @@ const Home = () => {
             lng = state.userLocation?.coords?.longitude;
         }
         else {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setFirstHeading('All Salons')
+                // Alert.alert('Permission to access location was denied');
+                alertRef.alertWithType('warn', '', 'You cannot see nearby salons without sharing your location');
+                // return;
+            }
+            else {
+                setFirstHeading('Nearest To You')
+            }
+
             try {
                 var locationn = await Location.getCurrentPositionAsync({});
             }
@@ -75,9 +83,9 @@ const Home = () => {
                 }
             }
         }
-        if (shortAddress == 'Loading' || shortAddress == '' ) {
+
+        if (shortAddress == 'Loading' || shortAddress == '' && !state.userLocation?.coords?.latitude) {
             let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${MAPS_KEY}`;
-            console.log(url)
             fetch(url)
                 .then(data => data.json())
                 .then(data => {
@@ -108,6 +116,8 @@ const Home = () => {
                         lng,
                         token: data.token
                     }
+                    // console.log('post Obj')
+                    // console.log(postObj)
                     ApiRequestForSalon(postObj);
                 };
             });
@@ -138,7 +148,6 @@ const Home = () => {
     function makeShortTitle(address_components) {
         var title = ""
         var found = false
-        console.log(address_components)
         address_components?.forEach((e) => {
             if (e["types"]?.includes("locality")) {
                 found = true
@@ -171,12 +180,28 @@ const Home = () => {
                     forceUpdate();
                 }
             })
+        console.log('state.locations')
+        console.log(state.userLocation)
         get_salons()
-    }, [],
+    }, [state.userLocation],
     ))
     // useEffect(() => {
     //     get_salons()
     // }, [])
+
+    const MakeReview = ({ number }) => {
+        console.log(number)
+        var stars = [];
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                // <View>
+                <RattingStarIcon width={9} height={8} color={i > number ? "grey" : null} />
+                // </View>
+            )
+        }
+        return <View style={{ flexDirection: 'row' }}>{stars}</View>
+
+    }
 
 
     const SalonGridView = useCallback((item, index) => {
@@ -208,11 +233,12 @@ const Home = () => {
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
+
                         <RattingStarIcon />
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance != '0.00' && item.distance + " Km"} </Text>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance != '0.00' && item.distance + " mi"} </Text>
                     </View>
 
                 </View>

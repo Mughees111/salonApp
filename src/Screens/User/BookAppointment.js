@@ -98,8 +98,10 @@ const BookAppointment = (props) => {
 
     function get_salon_slots(date) {
 
-        var device_datetime_sql = currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
+        var device_datetime_sql = currentDateObj.getTime();
+        //  currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
         var service_time = 0;
+
 
         const reqObj = {
             token: state.userData.token,
@@ -113,6 +115,7 @@ const BookAppointment = (props) => {
         setLoading(true)
         apiRequest(reqObj, 'get_salon_slots')
             .then(data => {
+                // doConsole(data)
                 setLoading(false)
                 if (data.action == 'success') {
                     if (reqObj.appoint_id) {
@@ -168,10 +171,14 @@ const BookAppointment = (props) => {
                 if (data.action == 'success') {
                     alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
                     // appointmnet object
-                    navigate('PaymentMethod', {
-                        app_id: data.app_id,
-                        date : selectedDate + ", " + arr[0].ss_start_time
-                    })
+                    if (props?.route?.params?.data?.mobile_pay == 1) {
+                        navigate('PaymentMethod', {
+                            app_id: data.app_id,
+                            date: selectedDate + ", " + arr[0].ss_start_time
+                        })
+                    }
+                    else props.navigation.popToTop();
+
                     // navigate('AppointBooked', selectedDate + ", " + arr[0].ss_start_time);
                 }
                 else {
@@ -184,7 +191,7 @@ const BookAppointment = (props) => {
     }
 
     useEffect(() => {
-        // doConsole(props.route.params)
+        doConsole(props.route.params)
         let date = props?.route?.params?.date ? props?.route?.params?.date : null
         setSelectedDate(date ? date : formatDate(currentDateObj))
         get_salon_slots(date ? date : null);

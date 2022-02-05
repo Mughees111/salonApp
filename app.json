@@ -20,12 +20,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mughees1512.salonApp",
-      "config" :{
-        "googleSignIn" : {
-          "reservedClientId" :"com.googleusercontent.apps.980626479473-0ebl3ruro1hkbuc2com4pmff0bmlttl3"
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "com.googleusercontent.apps.980626479473-0ebl3ruro1hkbuc2com4pmff0bmlttl3"
         }
       },
-      "googleServicesFile" :"./GoogleService-Info.plist",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
         "SKAdNetworkItems": [
@@ -39,21 +39,24 @@
       }
     },
     "android": {
-      "package": "com.mughees1512.salonApp",
-      "googleServicesFile" : "./google-services.json",
+      "package": "com.mughees1512.salonapp",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU"
+        },
+        "googleSignIn": {
+          "apiKey": "AIzaSyCXgqD7LDRA82zMLu3KKyY_8FT_9U49qKk",
+          "certificateHash": "7CEE46F73FA84A7973B3A05A9796359585A22792"
         }
       }
-      
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-facebook",
-      "expo-google-sign-in"
+      "expo-google-sign-in",
+      "expo-app-auth"
     ]
   }
 }

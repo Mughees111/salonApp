@@ -9,12 +9,16 @@ import { Header } from '../../Components/Header';
 import Reviews from '../../Components/Reviews';
 import { ChatIcon, ArrowLeft, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, RattingStarIcon, SearchIcon, MsgIcon, PhoneIcon, MarkerCancel } from '../../Components/Svgs';
 
+import { MaterialIcons } from '@expo/vector-icons';
+
 import { useFocusEffect } from '@react-navigation/native';
 import { apiRequest } from '../../utils/apiCalls';
 import { retrieveItem, useForceUpdate, doConsole } from '../../utils/functions';
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
+import ReactNativeModal from 'react-native-modal';
+import { urls } from '../../utils/Api_urls';
 
 var alertRef;
 
@@ -32,6 +36,12 @@ const AppointSchedule = () => {
     const [scheduled, setScheduled] = useState([]);
     const [history, setHistory] = useState([]);
     const [ispublic, setispublic] = useState(0)
+
+    const [reviewModal, setReviewModal] = useState(false)
+    const [app_rating, setAppRating] = useState(5)
+    const [app_review, setAppReview] = useState('')
+    const [appDataForUpdate, setAppDataForUpdate] = useState('');
+    const [refresh, setRefresh] = useState(false);
 
     function getAppointments() {
 
@@ -80,9 +90,41 @@ const AppointSchedule = () => {
             })
     }
 
+
+    function do_review() {
+        const reqObj = {
+            token: state?.userData?.token,
+            app_rating: app_rating,
+            app_review: app_review,
+            app_id: appDataForUpdate.app_id,
+            sal_id: appDataForUpdate.sal_id,
+            user: true,
+            app_status: "completed & reviewed"
+        }
+        doConsole(reqObj);
+        setLoading(true)
+
+        apiRequest(reqObj, 'complete_app')
+            .then(data => {
+                setLoading(false);
+                if (data.action == 'success') {
+                    alertRef.alertWithType("success", "Success")
+                    setAppReview('')
+                    setRefresh(!refresh)
+                }
+                else alertRef.alertWithType('error', "Error", data.error)
+            })
+            .catch(err => {
+                alertRef.alertWithType('error', "Error", urls.error);
+            })
+
+    }
+
+
+
     useFocusEffect(useCallback(() => {
         getAppointments()
-    }, [],
+    }, [refresh],
     ))
 
     const Tabs = () => (
@@ -112,16 +154,81 @@ const AppointSchedule = () => {
     )
 
 
+    const MakeReview = ({ number }) => {
+        var stars = [];
+        for (let i = 1; i <= 5; i++) {
+            let j = i;
+            stars.push(
+                <TouchableOpacity
+                    onPress={() => {
+                        console.log(i)
+                        setAppRating(i)
+                        // j = i
+                        forceUpdate();
+                    }}
+                >
+                    {/* <RattingStarIcon width={38.21} height={36.21} /> */}
+                    <RattingStarIcon width={38.21} height={36.21}
+                        color={i > app_rating ? "grey" : null}
+                    />
+                </TouchableOpacity>
+            )
+        }
+        return <View style={{ flexDirection: 'row' }}>{stars}</View>
+
+    }
+
+
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
+            <DropdownAlert ref={(ref) => alertRef = ref} />
+            {loading && <Loader />}
             <StatusBar
                 backgroundColor={acolors.bgColor}
                 style='light'
                 translucent={false}
             />
-            {loading && <Loader />}
-            <DropdownAlert ref={(ref) => alertRef = ref} />
+            {
+
+                <ReactNativeModal
+                    style={{ margin: 0 }}
+                    isVisible={reviewModal}
+                    backdropOpacity={1}
+                    onBackdropPress={() => {
+                        setReviewModal(false)
+                    }}
+                >
+                    <View style={{ width: 343, paddingVertical: 30, paddingHorizontal: 15, alignSelf: 'center', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 8 }}>
+                        <Text style={{ fontFamily: 'PMe', fontSize: 27, color: "#fff", alignSelf: 'center' }}>Write Review</Text>
+                        <View style={{ alignSelf: 'center', flexDirection: 'row', marginTop: 15 }}>
+                            <MakeReview />
+                        </View>
+                        <Text style={{ fontFamily: 'PMe', fontSize: 20, color: '#fff', marginTop: 20 }}>Note</Text>
+                        <TextInput
+                            multiline={true}
+                            value={app_review}
+                            onChangeText={setAppReview}
+                            textAlignVertical='top'
+                            style={{ width: "100%", height: 156, paddingHorizontal: 10, paddingTop: 10, backgroundColor: 'rgba(255,255,255,0.2)', marginTop: 10, borderRadius: 8, color: '#fff', fontFamily: 'PRe', fontSize: 16 }}
+                        />
+
+                        <TouchableOpacity
+                            onPress={() => {
+                                setReviewModal(false)
+                                do_review();
+
+                            }}
+                            style={{ width: "100%", height: 44, borderRadius: 8, backgroundColor: '#FE9D2C', justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
+                            <Text style={{ fontSize: 13, fontFamily: 'PBo', color: '#fff' }}>Submit</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ReactNativeModal>
+
+            }
+
 
             <SafeAreaView style={{ flex: 1, marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
@@ -136,8 +243,8 @@ const AppointSchedule = () => {
                             renderItem={({ item, index }) => {
                                 // var services = item.app_services.split(",");
                                 return (
-                                                        <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
-                                      {/* <View style={{ paddingHorizontal: 20 }}> */}
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
+                                        {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
                                             onPress={() => console.log(item)}
@@ -155,7 +262,7 @@ const AppointSchedule = () => {
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
                                                     <RattingStarIcon />
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " Km"}</Text>
+                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
                                                         <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
@@ -283,7 +390,7 @@ const AppointSchedule = () => {
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
                                                     <RattingStarIcon />
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " Km"}</Text>
+                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
                                                         <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
@@ -340,7 +447,7 @@ const AppointSchedule = () => {
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5</Text>
                                                     <RattingStarIcon />
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>5.5 Km</Text>
+                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>5.5 mi</Text>
                                                     <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row' }}>
                                                         <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
@@ -460,7 +567,7 @@ const AppointSchedule = () => {
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
                                                     <RattingStarIcon />
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " Km"}</Text>
+                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
                                                         <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
@@ -474,7 +581,6 @@ const AppointSchedule = () => {
                                         </TouchableOpacity>
                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, width: "100%" }}>
                                             {
-                                                // ['Hair Rebonding', 'Hair Styling', 'Facial Massage', 'Hair Styling', 'Hair Rebonding', 'Hair Rebonding', 'Facial Massage', 'Hair Rebonding',].
                                                 item.app_services.split(",").map((v, i) => {
                                                     return (
                                                         <View key={i} style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: 10, marginLeft: 5, marginTop: 10 }}>
@@ -510,6 +616,21 @@ const AppointSchedule = () => {
                                                 </View>
                                             </>
                                         }
+                                        {
+                                            item.app_status == 'completed' &&
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    // console.log(item)
+                                                    setAppDataForUpdate(item)
+                                                    // setAppId(item.app_id)
+                                                    setReviewModal(true)
+                                                    forceUpdate();
+                                                }}
+                                                style={{ flexDirection: 'row', marginTop: 10, }}>
+                                                <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 14, marginRight: 10 }}>Enjoyed salon services? Review your appointment now!</Text>
+                                                <MaterialIcons name='rate-review' size={22} color={'white'} />
+                                            </TouchableOpacity>
+                                        }
 
                                         <TouchableOpacity
                                             // onPress={() => navigateFromStack('HomeStack', 'SalonDetails')}
@@ -524,7 +645,10 @@ const AppointSchedule = () => {
 
                     }
                 </View>
+
+
             </SafeAreaView >
+
 
         </SafeAreaView >
     )

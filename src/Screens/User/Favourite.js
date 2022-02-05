@@ -144,7 +144,7 @@ const Favourites = () => {
                                         <RattingStarIcon />
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5 Km</Text>
+                                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>4.5 mi</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>

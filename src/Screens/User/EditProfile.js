@@ -95,7 +95,7 @@ const EditProfile = () => {
             alertRef.alertWithType('error', 'Error', "Please enter valid username");
             return
         }
-        if (phone.length < 11) {
+        if (phone.length < 10) {
             alertRef.alertWithType('error', 'Error', "Please provide a valid 10 digit phone number");
             return
         }
