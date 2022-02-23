@@ -3,9 +3,13 @@ export const urls = {
   // PHP_API: "http://192.168.100.4/cauaffBE/",
   // Image_Uri: "http://192.168.100.4/cauaffBE/api/",
 
-  API: "https://cauaff.fictiondevelopers.com/api/",
-  PHP_API: "https://cauaff.fictiondevelopers.com",
-  Image_Uri: "https://cauaff.fictiondevelopers.com/api/",
+  API: "http://192.168.1.109/couaff_new/api/",
+  PHP_API: "http://192.168.1.109/couaff_new/",
+  Image_Uri: "http://192.168.1.109/couaff_new/api/",
+
+  // API: "https://cauaff.fictiondevelopers.com/api/",
+  // PHP_API: "https://cauaff.fictiondevelopers.com",
+  // Image_Uri: "https://cauaff.fictiondevelopers.com/api/",
 
   //... more colors here
   MARGIN: false,

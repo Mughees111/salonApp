@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.5",
+    "@react-native-community/netinfo": "^7.1.9",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/material-bottom-tabs": "^6.0.3",
     "@react-navigation/material-top-tabs": "^5.3.15",
@@ -16,6 +17,7 @@
     "@react-navigation/native-stack": "^6.0.4",
     "@react-navigation/stack": "^6.0.11",
     "expo": "~43.0.2",
+    "expo-app-auth": "~11.0.3",
     "expo-device": "^4.1.0",
     "expo-facebook": "~12.0.3",
     "expo-google-app-auth": "^9.0.0",
@@ -27,12 +29,14 @@
     "expo-permissions": "~12.1.1",
     "expo-status-bar": "~1.1.0",
     "native-base": "^2.15.2",
+    "pusher-js": "^7.0.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-calendars": "^1.1274.0",
     "react-native-dropdownalert": "^4.3.0",
     "react-native-gesture-handler": "~1.10.2",
+    "react-native-gifted-chat": "^0.16.3",
     "react-native-image-slider-box": "^1.1.12",
     "react-native-modal": "^12.0.3",
     "react-native-paper": "^4.9.2",
@@ -45,8 +49,7 @@
     "react-native-vector-icons": "^8.1.0",
     "react-native-web": "0.17.1",
     "react-native-webview": "^11.16.0",
-    "rxjs": "^7.4.0",
-    "expo-app-auth": "~11.0.3"
+    "rxjs": "^7.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

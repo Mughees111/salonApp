@@ -70,13 +70,14 @@ const PrivacyPicker = (props: Props) => {
               setModal(false)
             }}
           >
-            <Text style={{ color: '#fff' }}>Close</Text>
+            <Text style={{ color: '#fff',fontFamily:"PRe" }}>Close</Text>
           </Button>
         </Left>
         <Body>
-          <Title style={{ color: "#A047C8", fontSize: 20 }}>Choose</Title>
+          <Title style={{ color: "white", fontSize: 20,alignSelf:'center',fontFamily:"PMe",marginLeft:50}}>Choose</Title>
         </Body>
         <Right />
+        
       </Header>
     )
   }
@@ -105,7 +106,8 @@ const PrivacyPicker = (props: Props) => {
             borderRadius: 15,
             paddingVertical: 5,
             paddingHorizontal: 10,
-            fontSize: 14
+            fontSize: 14,
+            fontFamily:'PRe'
           }}
         />
       </View>

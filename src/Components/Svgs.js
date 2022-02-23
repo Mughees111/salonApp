@@ -789,3 +789,73 @@ export function LOGO(props) {
     </Svg>
   )
 }
+
+export function ChatLargeIcon(props) {
+  return (
+    <Svg width={23.167} height={23.167} viewBox="0 0 23.167 23.167" {...props}>
+      <G data-name={589708}>
+        <G data-name="Group 774">
+          <G data-name="Group 773">
+            <Path
+              data-name="Path 2142"
+              d="M105.412 96h-8.688a.724.724 0 100 1.448h8.688a.724.724 0 100-1.448z"
+              transform="translate(4.344 4.344) translate(-96 -96)"
+              fill="#fff"
+            />
+          </G>
+        </G>
+        <G data-name="Group 776">
+          <G data-name="Group 775">
+            <Path
+              data-name="Path 2143"
+              d="M102.516 160h-5.792a.724.724 0 100 1.448h5.792a.724.724 0 100-1.448z"
+              transform="translate(4.344 7.24) translate(-96 -160)"
+              fill="#fff"
+            />
+          </G>
+        </G>
+        <G data-name="Group 778">
+          <G data-name="Group 777">
+            <Path
+              data-name="Path 2144"
+              d="M15.928 0H2.9A2.9 2.9 0 000 2.9v14.48a.723.723 0 00.417.656.734.734 0 00.307.068.724.724 0 00.463-.168L5.33 14.48h10.6a2.9 2.9 0 002.9-2.9V2.9A2.9 2.9 0 0015.928 0zm1.448 11.584a1.449 1.449 0 01-1.448 1.448H5.068a.723.723 0 00-.468.168l-3.152 2.631V2.9A1.449 1.449 0 012.9 1.448h13.028A1.449 1.449 0 0117.375 2.9z"
+              fill="#fff"
+            />
+          </G>
+        </G>
+        <G data-name="Group 780">
+          <G data-name="Group 779">
+            <Path
+              data-name="Path 2145"
+              d="M142.48 128a.724.724 0 000 1.448 1.449 1.449 0 011.448 1.448v12.248l-2.444-1.955a.729.729 0 00-.452-.158H130.9a1.449 1.449 0 01-1.448-1.448v-.724a.724.724 0 00-1.448 0v.724a2.9 2.9 0 002.9 2.9h9.881l3.422 2.738a.725.725 0 001.177-.566V130.9a2.9 2.9 0 00-2.904-2.9z"
+              transform="translate(5.792 5.792) translate(-128 -128)"
+              fill="#fff"
+            />
+          </G>
+        </G>
+      </G>
+    </Svg>
+  )
+}
+
+
+export function SendIcon(props) {
+  return (
+    <Svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <Path
+        d="M3 11l19-9-9 19-2-8-8-2z"
+        stroke="#111"
+        strokeWidth={1.6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}

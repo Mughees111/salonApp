@@ -161,9 +161,9 @@ const BookAppointment = (props) => {
             sal_id: props?.route?.params?.data?.sal_id,
             app_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null
         }
-        doConsole(reqObj);
+        // doConsole(reqObj);
         setLoading(true)
-
+        // doConsole(props?.route?.params?.data?.mobile_pay);
         apiRequest(reqObj, 'book_appoint')
             .then(data => {
                 setLoading(false)
@@ -171,7 +171,7 @@ const BookAppointment = (props) => {
                 if (data.action == 'success') {
                     alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
                     // appointmnet object
-                    if (props?.route?.params?.data?.mobile_pay == 1) {
+                    if (props?.route?.params?.data?.mobile_pay == '1') {
                         navigate('PaymentMethod', {
                             app_id: data.app_id,
                             date: selectedDate + ", " + arr[0].ss_start_time

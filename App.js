@@ -51,6 +51,10 @@ import { urls } from './src/utils/Api_urls';
 import { Provider } from './src/Context/DataContext';
 
 import * as Device from 'expo-device';
+import UserChat from './src/Screens/User/UserChat';
+import ChatDetails from './src/Screens/User/ChatDetails';
+import DelAccount from './src/Screens/User/DelAccount';
+import HealthSafety from './src/Screens/User/HealthSafety';
 
 const OnBoarding = createMaterialTopTabNavigator()
 const Stack = createStackNavigator()
@@ -87,6 +91,17 @@ function AuthStack() {
 
 }
 
+
+function UserChatNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="UserChat" component={UserChat} />
+      <Stack.Screen name="ChatDetails" component={ChatDetails} />
+    </Stack.Navigator>
+  )
+}
+
+
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -103,6 +118,8 @@ function HomeStack() {
       <Stack.Screen name="PaypalAccount" component={PaypalAccount} />
       <Stack.Screen name="EditPayPalDetails" component={EditPayPalDetails} />
       <Stack.Screen name="AddCardDetails" component={AddCardDetails} />
+
+      <Stack.Screen name="UserChatNavigator" component={UserChatNavigator} />
     </Stack.Navigator>
   )
 }
@@ -303,6 +320,8 @@ export default function App() {
             <Stack.Screen name="CancellationPolicy" component={CancellationPolicy} />
             <Stack.Screen name="TermsOfServices" component={TermsOfServices} />
             <Stack.Screen name="Favourites" component={Favourites} />
+            <Stack.Screen name="DelAccount" component={DelAccount} />
+            <Stack.Screen name="HealthSafety" component={HealthSafety} />
           </Stack.Navigator>
         }
         {/* </Stack.Navigator> */}

@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useContext, useState, useEffect } from 'react'
 import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, Dimensions } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
-import { goBack, navigate } from '../../../Navigations';
+import { goBack, navigate, navigateFromStack } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
 import { ChatIcon, ArrowLeft, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, RattingStarIcon, SearchIcon, HeartIcon, MsgIcon, PhoneIcon } from '../../Components/Svgs';
 import Reviews from '../../Components/Reviews';
@@ -81,7 +81,7 @@ const SalonDetails = (props) => {
                 setLoading(false)
                 if (data.action == 'success') {
                     setSalImgs(data.imgs);
-                    params.sal_services = data.sal_services
+                    params.sal_services = data?.sal_services
                     doConsole(data)
                     setSalReviews(data.sal_reviews);
                     setSalRatings(data.sal_ratings);
@@ -117,6 +117,11 @@ const SalonDetails = (props) => {
         return <View style={{ flexDirection: 'row' }}>{stars}</View>
 
     }
+
+
+
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: acolors.bgColor }}>
@@ -198,7 +203,17 @@ const SalonDetails = (props) => {
                                 <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{params?.distance} mi</Text>
                                 <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row' }}>
-                                    <TouchableOpacity style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            // console.log(params.convos)
+                                            navigateFromStack('UserChatNavigator', 'ChatDetails', {
+                                                name: params?.convos?.name,
+                                                picUrl: params?.convos?.picture,
+                                                convo_id: params?.convos?.convo_id,
+                                                user_id: params?.convos?.sal_id,
+                                            })
+                                        }}
+                                        style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                         <MsgIcon />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
@@ -293,6 +308,12 @@ const SalonDetails = (props) => {
                                 />
                             )}
                         />
+                        <TouchableOpacity
+                            style={{marginTop:15}}
+                            onPress={()=>navigate('HealthSafety',params?.sal_id)}
+                        >
+                            <Text style={[styles.headingText, { textDecorationLine: 'underline' }]}>Salon Health and Safety Rules</Text>
+                        </TouchableOpacity>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20, }}>
                             <Text style={{ fontSize: 17, fontFamily: 'PMe', color: 'white' }}>Reviews ({sal_reviews.length})</Text>
                             {sal_reviews.length > 0 &&

@@ -34,7 +34,7 @@ const EditProfile = () => {
 
 
 
-    
+
     function cameraUplaod() {
         var x = alertRef;
         update_dp_2(1, userData.token, "public_image")
@@ -105,7 +105,7 @@ const EditProfile = () => {
             token: userData?.token,
             username: username,
             phone: phone,
-            profile_pic : imgsUrlForUpload
+            profile_pic: imgsUrlForUpload
         }
         doConsole(postObj);
         setLoading(true)
@@ -219,15 +219,20 @@ const EditProfile = () => {
                         </TouchableOpacity> */}
 
                     </View>
-
                     <MainButton
                         text="Save"
                         btnStyle={{ marginTop: 30 }}
-                        onPress={() => { 
+                        onPress={() => {
                             doUpdateProfile()
                             // goBack();
-                         }}
+                        }}
                     />
+
+                    <TouchableOpacity 
+                        onPress={()=>navigate('DelAccount')}
+                        style={{ alignSelf: 'center', marginTop: 20 }}>
+                        <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'red' }}>Delete Account</Text>
+                    </TouchableOpacity>
 
                 </ScrollView>
 

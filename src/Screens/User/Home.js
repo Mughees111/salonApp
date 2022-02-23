@@ -16,6 +16,11 @@ import { Context } from '../../Context/DataContext';
 
 import * as Location from 'expo-location';
 
+import * as Notifications from 'expo-notifications'
+import * as Permissions from 'expo-permissions';
+import { urls } from '../../utils/Api_urls';
+
+
 var alertRef;
 const useForceUpdate = () => {
     const [, updateState] = useState();
@@ -170,6 +175,45 @@ const Home = () => {
         return r?.results[0]?.formatted_address ?? "Unknown"
     }
 
+
+    async function askNotificationPermission() {
+        const { status: existingStatus } = await Permissions.getAsync(
+            Permissions.NOTIFICATIONS
+        );
+        let finalStatus = existingStatus;
+
+
+        if (finalStatus !== 'granted') {
+            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+            finalStatus = status;
+        }
+        if (finalStatus == 'granted') {
+            try {
+                let token = await Notifications.getExpoPushTokenAsync();
+                // setNotif_token(token.data)
+                store_location_on_server(token.data)
+            } catch (error) {
+                // alert(error);
+            }
+        }
+    }
+
+
+    async function store_location_on_server(localToken) {
+        const dbData = { token: state.userData?.token ?? "", notif_key: localToken };
+        console.log(dbData);
+        console.log("push token")
+        fetch(urls.API + 'do_store_notifiation_key', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dbData),
+        })
+    }
+
+
     const keyExtractor = ((item, index) => index.toString())
 
     useFocusEffect(useCallback(() => {
@@ -180,14 +224,12 @@ const Home = () => {
                     forceUpdate();
                 }
             })
-        console.log('state.locations')
-        console.log(state.userLocation)
         get_salons()
     }, [state.userLocation],
     ))
-    // useEffect(() => {
-    //     get_salons()
-    // }, [])
+    useEffect(() => {
+        askNotificationPermission()
+    }, [])
 
     const MakeReview = ({ number }) => {
         console.log(number)
@@ -286,7 +328,9 @@ const Home = () => {
                             >
                                 <NotificationIcon />
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ marginLeft: 10 }}>
+                            <TouchableOpacity
+                                onPress={() => navigate('UserChatNavigator')}
+                                style={{ marginLeft: 10 }}>
                                 <ChatIcon />
                             </TouchableOpacity>
 

@@ -76,6 +76,7 @@ const NearBy = () => {
 
                     apiRequest(postObj, 'get_nearby_salons')
                         .then(data => {
+                            console.log(data)
                             setLoading(false)
                             if (data.action == 'success') {
                                 setNearByData(data.data)

@@ -40,7 +40,7 @@ const AppointSchedule = () => {
     const [reviewModal, setReviewModal] = useState(false)
     const [app_rating, setAppRating] = useState(5)
     const [app_review, setAppReview] = useState('')
-    const [appDataForUpdate, setAppDataForUpdate] = useState('');
+    const [appDataForUpdate, setAppDataForUpdate] = useState();
     const [refresh, setRefresh] = useState(false);
 
     function getAppointments() {
