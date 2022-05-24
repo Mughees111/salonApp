@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useContext, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, Dimensions, Alert, ScrollView, Switch } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, Dimensions, Alert, ScrollView, Switch, Linking } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
 import { goBack, navigate, navigateFromStack } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
@@ -134,7 +134,7 @@ const AppointSchedule = () => {
                     setTabs('pendings')
                 }}
                 style={[tabs == 'pendings' ? styles.activeTab : styles.inActiveTab, { borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }]} >
-                <Text style={tabs == 'pendings' ? styles.activeTabText : styles.inActiveTabText}>Pendings</Text>
+                <Text style={tabs == 'pendings' ? styles.activeTabText : styles.inActiveTabText}>Pending</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={() => {
@@ -232,7 +232,7 @@ const AppointSchedule = () => {
 
             <SafeAreaView style={{ flex: 1, marginTop: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
-                    <Header title="Appointment" />
+                    <Header title="Appointments" />
                     <Tabs />
                     {
                         tabs == 'pendings' &&
@@ -259,17 +259,36 @@ const AppointSchedule = () => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                        <>
+                                                            <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
+                                                            <RattingStarIcon />
+                                                        </>
+                                                    }
                                                     <RattingStarIcon />
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
-                                                        <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                // console.log(item)
+                                                                navigateFromStack('UserChatNavigator', 'ChatDetails', {
+                                                                    name: item?.convos?.name,
+                                                                    picUrl: item?.convos?.picture,
+                                                                    convo_id: item?.convos?.convo_id,
+                                                                    user_id: item?.convos?.sal_id,
+                                                                })
+                                                            }}
+                                                            style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
-                                                        </View>
-                                                        <View style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                Linking.openURL(`tel:+${item?.sal_phone}`, '_blank');
+                                                            }}
+                                                            style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <PhoneIcon />
-                                                        </View>
+                                                        </TouchableOpacity>
                                                     </View>
                                                 </View>
                                             </View>
@@ -387,17 +406,34 @@ const AppointSchedule = () => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
-                                                    <RattingStarIcon />
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                        <>
+                                                            <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
+                                                            <RattingStarIcon />
+                                                        </>
+                                                    }
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
-                                                        <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                navigateFromStack('UserChatNavigator', 'ChatDetails', {
+                                                                    name: item?.convos?.name,
+                                                                    picUrl: item?.convos?.picture,
+                                                                    convo_id: item?.convos?.convo_id,
+                                                                    user_id: item?.convos?.sal_id,
+                                                                })
+                                                            }}
+                                                            style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
-                                                        </View>
-                                                        <View style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                Linking.openURL(`tel:+${item?.sal_phone}`, '_blank');
+                                                            }}
+                                                            style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <PhoneIcon />
-                                                        </View>
+                                                        </TouchableOpacity>
                                                     </View>
                                                 </View>
                                             </View>
@@ -482,9 +518,9 @@ const AppointSchedule = () => {
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Paid</Text>
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, }}>{item?.is_paid == 1 ? item?.app_price : "0"}</Text>
                                         </View>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, alignItems: 'center' }}>
-                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Remind me 1h in advance</Text>
-                                            <Switch
+                                        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, alignItems: 'center' }}> */}
+                                        {/* <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Remind me 1h in advance</Text> */}
+                                        {/* <Switch
                                                 trackColor={{ false: "white", true: 'grey' }}
                                                 thumbColor={ispublic ? acolors.primary : "grey"}
                                                 ios_backgroundColor="#3e3e3e"
@@ -494,7 +530,7 @@ const AppointSchedule = () => {
                                                 }}
                                                 value={ispublic == 1 ? true : false}
                                             />
-                                        </View>
+                                        </View> */}
                                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
                                             <TouchableOpacity
                                                 onPress={() => {
@@ -525,12 +561,12 @@ const AppointSchedule = () => {
                                                 </TouchableOpacity>
                                             }
                                         </View>
-                                        <TouchableOpacity
+                                        {/* <TouchableOpacity
                                             onPress={() => navigate('CancellationPolicy')}
                                             style={{ width: "100%", borderRadius: 8, marginTop: 10, paddingVertical: 10, paddingHorizontal: 10, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.3)' }}>
                                             <MarkerCancel />
                                             <Text style={{ fontFamily: 'PMe', fontSize: 10, color: 'white', marginLeft: 5 }}>Read cancellation policy</Text>
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
                                     </View>
                                 )
                             }}
@@ -564,17 +600,34 @@ const AppointSchedule = () => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.sal_reviews}</Text>
-                                                    <RattingStarIcon />
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                        <>
+                                                            <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
+                                                            <RattingStarIcon />
+                                                        </>
+                                                    }
                                                     <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{item?.distance + " mi"}</Text>
                                                     <View style={{ position: 'absolute', bottom: -5, right: 0, flexDirection: 'row' }}>
-                                                        <View style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                navigateFromStack('UserChatNavigator', 'ChatDetails', {
+                                                                    name: item?.convos?.name,
+                                                                    picUrl: item?.convos?.picture,
+                                                                    convo_id: item?.convos?.convo_id,
+                                                                    user_id: item?.convos?.sal_id,
+                                                                })
+                                                            }}
+                                                            style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <MsgIcon />
-                                                        </View>
-                                                        <View style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => {
+                                                                Linking.openURL(`tel:+${item?.sal_phone}`, '_blank');
+                                                            }}
+                                                            style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                                             <PhoneIcon />
-                                                        </View>
+                                                        </TouchableOpacity>
                                                     </View>
                                                 </View>
                                             </View>
@@ -633,7 +686,21 @@ const AppointSchedule = () => {
                                         }
 
                                         <TouchableOpacity
-                                            // onPress={() => navigateFromStack('HomeStack', 'SalonDetails')}
+                                            onPress={() => {
+                                                let makeBookedServices = item.app_services.split(",");
+                                                doConsole(makeBookedServices);
+                                                for (let i = 0; i < item.sal_services.length; i++) {
+                                                    if (makeBookedServices.includes(item.sal_services[i].s_name)) {
+                                                        item.sal_services[i].isAdded = true
+                                                    }
+                                                }
+                                                item.app_id = null;
+                                                item.app_date = null;
+                                                item.app_status = null;
+                                                doConsole(item)
+                                                navigate('SeeAllServices', item)
+                                                // navigateFromStack('HomeStack', 'SalonDetails')
+                                            }}
                                             style={{ alignSelf: 'flex-end', marginTop: 15, paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: 106, alignItems: 'center', justifyContent: 'center' }}>
                                             <Text style={{ color: '#111111', fontFamily: 'PRe', fontSize: 14 }}>Book Again</Text>
                                         </TouchableOpacity>

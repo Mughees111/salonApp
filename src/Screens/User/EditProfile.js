@@ -61,6 +61,8 @@ const EditProfile = () => {
             })
     }
 
+    
+
     function gallaryUpload() {
 
         var x = alertRef;
@@ -177,18 +179,7 @@ const EditProfile = () => {
                             value={username}
                             onChangeText={setUserName}
                             placeholderTextColor={"white"}
-                            style={{
-                                width: "100%",
-                                height: 42,
-                                borderRadius: 8,
-                                borderWidth: 1,
-                                borderColor: acolors.white,
-                                color: acolors.white,
-                                fontFamily: 'PRe',
-                                fontSize: 14,
-                                paddingHorizontal: 10,
-                                marginTop: 10
-                            }}
+                            style={{width: "100%",height: 42,borderRadius: 8,borderWidth: 1,borderColor: acolors.white,color: acolors.white,fontFamily: 'PRe',fontSize: 14,paddingHorizontal: 10,marginTop: 10}}
                         />
                         {/* <TouchableOpacity style={{ width: 20, position: 'absolute', top: 10, height: 42, alignSelf: 'center', justifyContent: 'center', right: 10, }}>
                             <PencilIcon2 style={{ alignSelf: 'center' }} color={acolors.primary} />
@@ -201,18 +192,7 @@ const EditProfile = () => {
                             onChangeText={setPhone}
                             value={phone}
                             placeholderTextColor={"white"}
-                            style={{
-                                width: "100%",
-                                height: 42,
-                                borderRadius: 8,
-                                borderWidth: 1,
-                                borderColor: acolors.white,
-                                color: acolors.white,
-                                fontFamily: 'PRe',
-                                fontSize: 14,
-                                paddingHorizontal: 10,
-                                marginTop: 10
-                            }}
+                            style={{width: "100%",height: 42,borderRadius: 8,borderWidth: 1,borderColor: acolors.white,color: acolors.white,fontFamily: 'PRe',fontSize: 14,paddingHorizontal: 10,marginTop: 10}}
                         />
                         {/* <TouchableOpacity style={{ width: 20, position: 'absolute', top: 10, height: 42, alignSelf: 'center', justifyContent: 'center', right: 10, }}>
                             <PencilIcon2 style={{ alignSelf: 'center' }} color={acolors.primary} />

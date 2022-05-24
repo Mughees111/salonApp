@@ -85,9 +85,9 @@ const UserChat = (props) => {
                     })
                 }}
                 style={{ width: "100%", height: 58.67, marginTop: 20, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)', paddingBottom: 10 }}>
-                <Image
-                    style={{ width: 40, height: 40, borderRadius: 20, marginLeft: 10, }}
-                    source={{ uri: item?.user?.avatar }}
+               <Image
+                    style={{ width: 40, height: 40, borderRadius: 20 }}
+                    source={{ uri: item.image }}
                 />
                 <View
                     style={{ width: "90%" }}
@@ -99,10 +99,7 @@ const UserChat = (props) => {
                     <Text style={{ marginLeft: 12, fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.last_msg?.msg}</Text>
                     <Text style={{ marginLeft: 12, fontFamily: 'PRe', fontSize: 8, color: '#FFFFFF', position: 'absolute', right: 20, top: 15 }}>{item?.last_msg?.ago}</Text>
                 </View>
-                <Image
-                    style={{ position: 'absolute', left: 0, width: 58, height: 59, borderRadius: 39.5 }}
-                    source={{ uri: item.image }}
-                />
+               
             </TouchableOpacity>)
     }, [chatBg])
 

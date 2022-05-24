@@ -22,7 +22,7 @@ import { changeLoggedIn } from '../../../Common';
 
 var alertRef
 
-const DelAccount = () => {
+const DelAccount = (props) => {
 
     const forceUpdate = useForceUpdate();
     const { state, setUserGlobal } = useContext(Context);
@@ -67,8 +67,9 @@ const DelAccount = () => {
             .then(data => {
                 setLoading(false)
                 if (data.action == 'success') {
-                    storeItem('login_data', '')
-                    changeLoggedIn.changeNow(2);
+                    props.navigation.popToTop();
+                    // storeItem('login_data', '')
+                    // changeLoggedIn.changeNow(2);
                 }
                 else alertRef.alertWithType('error', "Error", data.error);
             })

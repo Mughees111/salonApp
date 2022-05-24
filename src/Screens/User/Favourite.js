@@ -98,8 +98,8 @@ const Favourites = () => {
 
             <SafeAreaView style={{ marginTop: 10, width:"95%",alignSelf:'center'}}>
                 <View style={{ paddingHorizontal: 20 }}>
-                    <Header title="Favorites" />
-                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are your favorite saloons</Text>
+                    <Header title="Favourites" />
+                    {/* <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are your favorite saloons</Text> */}
                 </View>
                 <FlatList
                     data={data}

@@ -25,6 +25,7 @@ import { Bubble, Composer, Day, GiftedChat, InputToolbar, Send, Time } from 'rea
 let alertRef;
 //ATUO
 import Pusher from 'pusher-js/react-native';
+import { goBack } from '../../../Navigations';
 
 Pusher.logToConsole = true;
 var pusher = new Pusher('033f6b20d0bff06d62de', {
@@ -224,25 +225,25 @@ const ChatDetails = (props) => {
             />
             <DropdownAlert ref={(ref) => alertRef = ref} />
 
-            <View style={{ width: "80%", alignSelf: 'center' }}>
+            <View style={{ width: "90%", alignSelf: 'center' }}>
                 {/* Header */}
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: Platform.OS == 'ios' ? 35 : 25, alignItems: 'center' }}>
 
                     <TouchableOpacity
-                        onPress={() => {
-                            props.navigation.goBack();
-                        }}
-                        style={{ alignSelf: 'center' }}>
+                        style={{ width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingRight: 2 }}
+                        onPress={() => goBack()}
+                    >
                         <ArrowLeft />
                     </TouchableOpacity>
-                    {/* <View style={{ flexDirection: 'row' }}> */}
-                    <Image
-                        style={{ width: 44, height: 44, borderRadius: 22, }}
-                        source={{ uri: picUrl }}
-                    />
+                    <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                        <Image
+                            style={{ width: 44, height: 44, borderRadius: 22,marginRight:10 }}
+                            source={{ uri: picUrl }}
+                        />
 
-                    <Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold', textTransform: 'capitalize' }}>{name}</Text>
+                        <Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 'bold', textTransform: 'capitalize' }}>{name}</Text>
+                    </View>
                 </View>
             </View>
 
@@ -277,14 +278,14 @@ const ChatDetails = (props) => {
                         );
                     }}
 
-                    renderInputToolbar={() => {
-                        return <View style={{ width: "100%" }}>
+                    // renderInputToolbar={() => {
+                    //     return <View style={{ width: "100%" }}>
 
-                        </View>
+                    //     </View>
 
 
 
-                    }}
+                    // }}
                     renderSend={(props) => {
                         return (
                             <Send

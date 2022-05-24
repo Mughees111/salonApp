@@ -14,6 +14,7 @@ import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
 
+
 var alertRef;
 
 
@@ -47,8 +48,11 @@ const SeeAllServices = (props) => {
 
     useEffect(() => {
         let arr = sal_services
+        console.log('added = ' + params.addedService)
+        console.log()
         var total = 0;
         for (let key in arr) {
+            if(arr[key].id == params?.addedService) arr[key].isAdded = true;
             if (!arr[key].isAdded) {
                 arr[key].isAdded = false
             }
@@ -117,10 +121,10 @@ const SeeAllServices = (props) => {
                             style={{ width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
                             <ArrowLeft />
                         </TouchableOpacity>
-                        <Text style={{ fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Service List</Text>
+                        <Text style={{ fontFamily: 'PMe', fontSize: 16, color: acolors.white }}>Services</Text>
                         <Text>          </Text>
                     </View>
-                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>All the services</Text>
+                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Services</Text>
                     <FlatList
                         keyExtractor={keyExtractor}
                         contentContainerStyle={{ paddingBottom: 250 }}

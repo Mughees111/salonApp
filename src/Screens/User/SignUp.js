@@ -32,13 +32,14 @@ var alertRef;
 const SignUp = () => {
 
 
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('Testing OTP')
+    const [email, setEmail] = useState('otp@otp.com')
 
-    const [phone, setPhone] = useState('')
-    const [password, setPassword] = useState('')
-    const [cPass, setCPass] = useState('')
+    const [phone, setPhone] = useState('3134081068')
+    const [password, setPassword] = useState('12345678')
+    const [cPass, setCPass] = useState('12345678')
     const [loading, setLoading] = useState(false)
+    const [phoneCode, setPhoneCode] = useState('+1');
 
     const [showPass, setShowPass] = useState(true);
 
@@ -56,7 +57,11 @@ const SignUp = () => {
         if (!validateEmail(e)) {
             alertRef.alertWithType("error", "Error", "Please provide a valid email address");
             return;
+        }
 
+        if (phone.length < 1) {
+            alertRef.alertWithType("error", "Error", "Please enter a valid phone number");
+            return;
         }
 
         if (password.length < 8) {
@@ -68,36 +73,69 @@ const SignUp = () => {
             return;
         }
 
-        setLoading(true)
-        var dbData = {
+        setLoading(true);
+        const dbData = {
             email: e,
             username,
             password,
             phone,
-
             device_model: Device?.modelName ? Device?.modelName : null,
             device_manufactur: Device?.manufacturer ? Device?.manufacturer : null
         };
 
-        doConsole(" I request @ " + urls.API + "signup");
-        doConsole(dbData);
+        const sendOtpObj = {
+            country_code: phoneCode,
+            phone: phone,
+            code_text: "321"
+        }
 
-        apiRequest(dbData, 'signup')
+        apiRequest({ email: e }, 'check_email_exist')
             .then(data => {
+                console.log(data)
                 if (data.action == 'success') {
-                    storeItem("login_data", data.data).then(() => {
-                        storeItem("is_guest", '0')
-                        changeLoggedIn.changeNow(1);
-                    })
+
+                    apiRequest(sendOtpObj, 'send_otp')
+                        .then(data => {
+                            if (data.action == 'success') {
+                                navigate('OTP', {
+                                    slip: data.slip,
+                                    signupObj: dbData
+                                })
+                            }
+                            else alertRef.alertWithType("error", "Error", data.error);
+                        })
+                        .catch(err => {
+                            alertRef.alertWithType("error", "Error", "Network Error");
+                        })
                 }
                 else {
-                    setLoading(false)
+
                     alertRef.alertWithType("error", "Error", data.error);
+                    setLoading(false)
                 }
             })
             .catch(err => {
-                console.log(err)
+
+                setLoading(false)
+                alertRef.alertWithType("error", "Error", "Network Error");
             })
+
+        // apiRequest(dbData, 'signup')
+        //     .then(data => {
+        //         if (data.action == 'success') {
+        //             storeItem("login_data", data.data).then(() => {
+        //                 storeItem("is_guest", '0')
+        //                 changeLoggedIn.changeNow(1);
+        //             })
+        //         }
+        //         else {
+        //             setLoading(false)
+        //             alertRef.alertWithType("error", "Error", data.error);
+        //         }
+        //     })
+        //     .catch(err => {
+        //         console.log(err)
+        //     })
 
     }
 
@@ -360,23 +398,23 @@ const SignUp = () => {
                 androidStandaloneAppClientId: "527892875003-2jchbb27rqtsutlmtitgtn0k5p9hgqfs.apps.googleusercontent.com",
                 // iosStandaloneAppClientId: "350112122949-67ini3k965oakm3cjvmmncje4fa6s106.apps.googleusercontent.com",
                 scopes: ['profile', 'email'],
-                
+
 
                 // redirectUrl: `${AppAuth.OAuthRedirect}:/oauth2redirect`
             });
-            
+
             if (result.type === 'success') {
                 console.log(result.accessToken);
                 getUserInfo(result.accessToken);
 
             } else {
                 // Alert.alert('asd')                
-                alertRef.alertWithType('error',"Error","Something went wrong please try again later.")
+                alertRef.alertWithType('error', "Error", "Something went wrong please try again later.")
                 console.log("cancleed");
             }
         } catch (e) {
             // console.log("error");
-            alertRef.alertWithType('error',"Error","Something went wrong please try again later.")
+            alertRef.alertWithType('error', "Error", "Something went wrong please try again later.")
             console.log(e);
             // return { error: true };
         }
@@ -454,6 +492,7 @@ const SignUp = () => {
                                     selected={{ title: "+1" }}
                                     data={[{ title: "+1" }]}
                                     onValueChange={(index, title) => {
+                                        setPhoneCode(title.title);
                                         // setCondition(title.title)
                                     }}
                                 />
@@ -547,3 +586,7 @@ const styles = StyleSheet.create({
 })
 
 export default SignUp
+
+
+
+// WWHQTXAvChCHynzTxUPZDKq0qh2VOh9-G_IsnI-A

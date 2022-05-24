@@ -1,15 +1,15 @@
 
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useState, useEffect, useContext } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, Alert } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, RefreshControl, Alert, Linking } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
-import { navigate } from '../../../Navigations';
+import { navigate, navigateFromStack } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
 import { ChatIcon, FilterIcon, LocationBtmIcon, LocationIcon, NotificationIcon, RattingStarIcon, SearchIcon } from '../../Components/Svgs';
 
 import { useFocusEffect } from '@react-navigation/native';
 import { apiRequest } from '../../utils/apiCalls';
-import { retrieveItem, } from '../../utils/functions';
+import { retrieveItem, storeItem } from '../../utils/functions';
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
@@ -19,6 +19,9 @@ import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions';
 import { urls } from '../../utils/Api_urls';
+import { navigateToPost, navigateToPostNow } from '../../../Common';
+
+import { AntDesign } from '@expo/vector-icons'
 
 
 var alertRef;
@@ -27,7 +30,7 @@ const useForceUpdate = () => {
     return useCallback(() => updateState({}), []);
 }
 
-const Home = () => {
+const Home = (props) => {
 
     const forceUpdate = useForceUpdate();
     const { state, setUserGlobal, setUserLocationGlobal } = useContext(Context);
@@ -37,29 +40,59 @@ const Home = () => {
     const [mensData, setMensData] = useState([]);
     const [womensData, setWomensData] = useState([]);
     const [recommended, setRecommended] = useState([]);
+    const [topLiked, setTopLiked] = useState([]);
+    const [recentSalons, setRecentSalons] = useState([]);
+
+    const [notifCount, setNotifCount] = useState(0);
 
     const [searchWord, setSearchWord] = useState('');
 
     const [lat, setLat] = useState('')
     const [lng, setLng] = useState('')
 
-    const [firstHeading, setFirstHeading] = useState('Nearest To You');
+    const [firstHeading, setFirstHeading] = useState('Professionals near you');
+    const [refreshing, setRefreshing] = React.useState(false);
+
 
     const [shortAddress, setShortAddress] = useState('Loading');
-    const production = false;
-    const MAPS_KEY = production ? "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
+    const production = true;
+    // "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU"
+    const MAPS_KEY = production ? "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
+
+
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        get_salons()
+        // wait(2000).then(() => setRefreshing(false));
+    }, []);
+
+
+
+    const handleNotificationClick = async ()=>{
+        navigateToPost.subscribe((t)=>{
+            console.log("honor received");
+            console.log(t);
+            if(t.where=="notif"){
+                navigate("Notifications");
+                navigateToPostNow.navigate({id:0,where:"nowhere"});
+            }
+            if(t.where=="chat"){
+                navigateFromStack("UserChatNavigator", "ChatDetails",{user_id:0,convo_id:t?.id,picUrl:"",name:"Loading",username:"Loading..."})
+                navigateToPostNow.navigate({id:0,where:"nowhere"})
+            }
+        })
+    }
+
+
 
     async function get_salons() {
 
-        if (mensData.length < 1 || womensData.length < 1) {
-            console.log(mensData.length)
-            setLoading(true)
-        }
-
+        setLoading(true)
         var lat;
         var lng;
         if (state?.userLocation?.coords?.latitude) {
-            console.log('yes i have user location in state');
+            // console.log('yes i have user location in state');
             lat = state.userLocation?.coords?.latitude;
             lng = state.userLocation?.coords?.longitude;
         }
@@ -67,12 +100,10 @@ const Home = () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setFirstHeading('All Salons')
-                // Alert.alert('Permission to access location was denied');
                 alertRef.alertWithType('warn', '', 'You cannot see nearby salons without sharing your location');
-                // return;
             }
             else {
-                setFirstHeading('Nearest To You')
+                setFirstHeading('Professionals near you')
             }
 
             try {
@@ -89,8 +120,15 @@ const Home = () => {
             }
         }
 
-        if (shortAddress == 'Loading' || shortAddress == '' && !state.userLocation?.coords?.latitude) {
-            let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${MAPS_KEY}`;
+        if (locationn) {
+            lat = locationn?.coords?.latitude;
+            lng = locationn?.coords?.longitude;
+            setUserLocationGlobal(locationn)
+        }
+
+
+        if (shortAddress == 'Loading' || shortAddress == '') {
+            let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationn?.coords?.latitude},${locationn?.coords?.longitude}&key=${MAPS_KEY}`;
             fetch(url)
                 .then(data => data.json())
                 .then(data => {
@@ -106,11 +144,6 @@ const Home = () => {
                 })
         }
 
-        if (locationn) {
-            lat = locationn?.coords?.latitude;
-            lng = locationn?.coords?.longitude;
-            setUserLocationGlobal(locationn)
-        }
 
         retrieveItem('login_data')
             .then(data => {
@@ -121,8 +154,6 @@ const Home = () => {
                         lng,
                         token: data.token
                     }
-                    // console.log('post Obj')
-                    // console.log(postObj)
                     ApiRequestForSalon(postObj);
                 };
             });
@@ -130,15 +161,18 @@ const Home = () => {
     }
 
     function ApiRequestForSalon(postObj) {
-        // console.log('postObj in apiRe')
-        // console.log(postObj)
+
         apiRequest(postObj, 'get_salons')
             .then(data => {
+                console.log(data)
                 setLoading(false)
+                setRefreshing(false);
                 if (data.action == 'success') {
-                    setMensData(data.data.mens);
-                    setWomensData(data.data.womens);
-                    setRecommended(data.data.setRecommended)
+                    setMensData(data?.data?.mens);
+                    setWomensData(data?.data?.womens);
+                    setRecommended(data?.data?.recommended)
+                    setTopLiked(data?.data?.top_liked)
+
                     forceUpdate();
                 }
                 else {
@@ -146,7 +180,9 @@ const Home = () => {
                 };
             })
             .catch(err => {
+                console.log(err)
                 setLoading(false)
+                setRefreshing(false);
             })
     }
 
@@ -165,58 +201,142 @@ const Home = () => {
         })
 
         if (found) {
-            console.log(`short title: ${title}`)
+            // console.log(`short title: ${title}`)
             setShortAddress(title);
             forceUpdate();
             return title
         }
         else setShortAddress('');
-        console.log(`couldn't make short title`)
         return r?.results[0]?.formatted_address ?? "Unknown"
     }
 
 
     async function askNotificationPermission() {
-        const { status: existingStatus } = await Permissions.getAsync(
-            Permissions.NOTIFICATIONS
-        );
+
+
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+
+        // const { status: existingStatus } = await Permissions.getAsync(
+        //     Permissions.NOTIFICATIONS
+        // );
         let finalStatus = existingStatus;
 
 
         if (finalStatus !== 'granted') {
             const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
             finalStatus = status;
+
         }
+
+
         if (finalStatus == 'granted') {
             try {
-                let token = await Notifications.getExpoPushTokenAsync();
-                // setNotif_token(token.data)
-                store_location_on_server(token.data)
+                // let token = await Notifications.getExpoPushTokenAsync();
+                const token = (await Notifications.getExpoPushTokenAsync({
+                    experienceId: '@mughees1512/salonApp',
+                })).data;
+
+                store_location_on_server(token)
+
             } catch (error) {
-                // alert(error);
+
             }
         }
     }
 
 
     async function store_location_on_server(localToken) {
-        const dbData = { token: state.userData?.token ?? "", notif_key: localToken };
-        console.log(dbData);
-        console.log("push token")
-        fetch(urls.API + 'do_store_notifiation_key', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dbData),
+
+        retrieveItem('login_data')
+            .then(data => {
+                const dbData = { token: data?.token, notif_key: localToken };
+                fetch(urls.API + 'do_store_notifiation_key', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dbData),
+                })
+            })
+
+    }
+
+
+
+    // const handleNotificationClick = async () => {
+    //     navigateToPost.subscribe((t) => {
+    //         // console.log("honor received");
+    //         // console.log(t);
+    //         if (t.where == "profile") {
+    //             props.navigation.navigate("SalonDetails", { sal_id: t.id })
+    //             navigateToPostNow.navigate({ id: 0, where: "nowhere" })
+    //         }
+
+    //     })
+    // }
+
+
+    function makeRecentSalons(salon) {
+        retrieveItem('recent_salons')
+            .then(data => {
+                if (data) {
+                    let all = data;
+                    for (let key in data) {
+                        if (data[key].sal_id == salon.sal_id) {
+                            return;
+                        }
+                    }
+                    all.push(salon);
+                    storeItem('recent_salons', all);
+                }
+                else {
+                    let all = [];
+                    all.push(salon)
+                    storeItem('recent_salons', all);
+                }
+            })
+    }
+
+    function getRecentSalons() {
+        retrieveItem('recent_salons').then(data => {
+            if (data) {
+                setRecentSalons(data)
+            }
         })
     }
+
+    function get_notifs_count() {
+        retrieveItem('login_data').then(data => {
+            if (data) {
+                apiRequest({ token: data.token }, 'get_notifs_count')
+                    .then(data => {
+                        console.log(data)
+                        if (data.action == 'success') {
+                            setNotifCount(data?.notifs)
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+
+            }
+        })
+    }
+
 
 
     const keyExtractor = ((item, index) => index.toString())
 
     useFocusEffect(useCallback(() => {
+        getRecentSalons();
+        get_notifs_count();
+    }, [state.userLocation],
+    ))
+
+    useEffect(() => {
+
+        handleNotificationClick();
         retrieveItem('login_data')
             .then(data => {
                 if (data) {
@@ -224,15 +344,22 @@ const Home = () => {
                     forceUpdate();
                 }
             })
-        get_salons()
-    }, [state.userLocation],
-    ))
-    useEffect(() => {
+
+        get_salons();
+
+
+        // handleNotificationClick();
         askNotificationPermission()
+
+
     }, [])
 
+
+
+
+
     const MakeReview = ({ number }) => {
-        console.log(number)
+        // console.log(number)
         var stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
@@ -252,35 +379,45 @@ const Home = () => {
             <TouchableOpacity
                 onPress={() => {
                     // console.log(item)
+                    makeRecentSalons(item)
                     navigate('SalonDetails', item)
                 }}
-                style={{ width: 160, marginLeft: 15, height: 188, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}>
+                style={{ width: 180, marginLeft: 15, height: 199, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}>
 
                 <Image
-                    style={{ position: 'absolute', width: 160, height: 188, borderRadius: 10, resizeMode: 'stretch' }}
+                    style={{ position: 'absolute', width: 180, height: 200, borderRadius: 10, resizeMode: 'stretch' }}
                     source={{ uri: item.sal_profile_pic }}
 
                 />
                 <Image
-                    style={{ position: 'absolute', bottom: 0 }}
+                    style={{ position: 'absolute', bottom: 0, width: 180 }}
                     source={require('../../assets/salonShopMask.png')}
                 />
                 <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.sal_name}</Text>
-                <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${item?.sal_address + ", " + item?.sal_city + ", " + item?.sal_country}`);
+                    }} style={{ flexDirection: 'row' }}>
                     <LocationIcon color="rgba(252, 252, 252, 0.5)" />
                     <Text
                         numberOfLines={1}
                         ellipsizeMode='tail'
-                        style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
-                </View>
+                        style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}
+                    </Text>
+                </TouchableOpacity>
+                <Text style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_city}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
 
-                        <RattingStarIcon />
+                        {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                            <>
+                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
+                                <RattingStarIcon />
+                            </>
+                        }
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance != '0.00' && item.distance + " mi"} </Text>
+                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item.distance + " mi"} </Text>
                     </View>
 
                 </View>
@@ -299,7 +436,7 @@ const Home = () => {
                 style='light'
                 translucent={false}
             />
-            {loading && <Loader />}
+            {loading && !refreshing && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
             <Image
                 source={require('../../assets/HomeImg1.png')}
@@ -310,9 +447,16 @@ const Home = () => {
                 source={require('../../assets/HomeMask1.png')}
                 style={{ width: "100%", resizeMode: 'stretch', position: 'absolute', top: 0 }}
             />
+
             <SafeAreaView style={{ position: 'absolute', top: 10 }}>
                 <View style={{ paddingHorizontal: 20 }}>
-                    <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello {state?.userData?.username},</Text>
+                    <TouchableOpacity
+                        onLongPress={() => {
+                            alertRef.alertWithType("info", "Map API KEY", MAPS_KEY);
+                        }}
+                    >
+                        <Text style={{ color: acolors.primary, fontFamily: 'PBl', fontSize: 22, }}>Hello {state?.userData?.username},</Text>
+                    </TouchableOpacity>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 0 }}>
@@ -327,6 +471,12 @@ const Home = () => {
                                 onPress={() => navigate('Notifications')}
                             >
                                 <NotificationIcon />
+                                {notifCount > 0 && <View style={{ position: 'absolute', top: -5, right: -5, width: 15, height: 15, borderRadius: 7.5, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'white', fontSize: 8, fontFamily: 'PBo', }}>{notifCount}</Text>
+                                </View>
+                                }
+
+
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => navigate('UserChatNavigator')}
@@ -337,7 +487,7 @@ const Home = () => {
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, }}>
-                        <View style={{ width: "83%", height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, paddingHorizontal: 10, alignItems: 'center', flexDirection: 'row' }}>
+                        <View style={{ width: "100%", height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, paddingHorizontal: 10, alignItems: 'center', flexDirection: 'row' }}>
                             <TouchableOpacity>
                                 <SearchIcon />
                             </TouchableOpacity>
@@ -358,15 +508,15 @@ const Home = () => {
                                 style={{ marginLeft: 10, color: 'rgba(252, 252, 252, 1)', fontFamily: 'PRe', flex: 1 }}
                             />
                         </View>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => navigate('Categories')}
                             style={{ paddingHorizontal: 10, height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, alignItems: 'center', justifyContent: 'center', }}>
                             <FilterIcon />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
             </SafeAreaView>
-            <View style={{ paddingHorizontal: 20 }}>
+            <View style={{ paddingHorizontal: 10 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 20, width: "60%", alignSelf: 'center' }}>
                     <TouchableOpacity
                         onPress={() => {
@@ -389,77 +539,282 @@ const Home = () => {
                         <Text style={tabs.women ? styles.activeTabText : styles.inActiveTabText}>Women</Text>
                     </TouchableOpacity>
                 </View>
-                <ScrollView contentContainerStyle={{ paddingBottom: 400 }} >
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                    showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 400 }} >
+
+
+
                     <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>{firstHeading}</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigate('ViewAll', {
+                                    data: {
+                                        data: tabs.men ? mensData : womensData,
+                                        title: firstHeading
+                                    }
+                                })
+                            }}
+                        >
+                            <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
+                        </TouchableOpacity>
+
+
+
+                    </View>
+                    <View style={styles.listingMargin}>
+                        {
+                            tabs.men &&
+                            <>
+                                <FlatList
+                                    data={mensData}
+                                    horizontal={true}
+                                    style={{ marginTop: 10, }}
+                                    keyExtractor={keyExtractor}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <SalonGridView item={item} index={index} />
+                                    )}
+                                />
+
+
+                            </>
+                        }
+
+                        {
+                            tabs.women &&
+                            <>
+                                <FlatList
+                                    data={womensData}
+                                    horizontal={true}
+                                    style={{ marginTop: 10, }}
+                                    keyExtractor={keyExtractor}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <SalonGridView item={item} index={index} />
+                                    )}
+                                />
+                            </>
+                        }
+                    </View>
+
+                    {/* Recommended */}
+                    <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Recommended</Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigate('ViewAll', {
+                                    data: {
+                                        data: recommended,
+                                        title: "Recommended"
+                                    }
+                                })
+                            }}
+                        >
                             <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={styles.listingMargin}>
+                        <FlatList
+                            data={recommended}
+                            horizontal={true}
+                            style={{ marginTop: 10, }}
+                            keyExtractor={keyExtractor}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item, index }) => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        makeRecentSalons(item)
+                                        navigate('SalonDetails', item)
+                                    }}
+                                    style={{ width: 180, marginLeft: 15, height: 200, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}>
+
+                                    <Image
+                                        style={{ position: 'absolute', width: 180, height: 200, borderRadius: 10, resizeMode: 'stretch' }}
+                                        source={{ uri: item.sal_profile_pic }}
+
+                                    />
+                                    <Image
+                                        style={{ position: 'absolute', bottom: 0, width: 180, height: 200 }}
+                                        source={require('../../assets/salonShopMask.png')}
+                                    />
+                                    <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.sal_name}</Text>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${item?.sal_address + ", " + item?.sal_city + ", " + item?.sal_country}`);
+                                        }}
+                                        style={{ flexDirection: 'row' }
+                                        }>
+                                        <LocationIcon color="rgba(252, 252, 252, 0.5)" />
+                                        <Text
+                                            numberOfLines={1}
+                                            ellipsizeMode='tail'
+                                            style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
+                                    </TouchableOpacity>
+                                    <Text style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_city}</Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+                                            {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                <>
+                                                    <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF', marginRight: 2 }}>{item?.sal_ratings}</Text>
+                                                    <RattingStarIcon />
+                                                </>
+                                            }
+                                        </View>
+                                    </View>
+                                </TouchableOpacity >
+                            )}
+                        />
+                    </View>
+                    <View style={styles.listingMargin}>
+                        {
+                            recentSalons?.length > 0 &&
+                            <>
+                                <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17,marginLeft:8 }}>Recently Viewed</Text>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigate('ViewAll', {
+                                                data: {
+                                                    data: recentSalons,
+                                                    title: "Recent"
+                                                }
+                                            })
+                                        }}
+                                    >
+                                        <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <FlatList
+                                    data={recentSalons}
+                                    horizontal={true}
+                                    style={{ marginTop: 10, }}
+                                    keyExtractor={keyExtractor}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                // makeRecentSalons(item)
+                                                navigate('SalonDetails', item)
+                                            }}
+                                            style={{ width: 180, marginLeft: 15, height: 200, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10, }}>
+
+                                            <Image
+                                                style={{ position: 'absolute', width: 180, height: 200, resizeMode: 'stretch', borderRadius: 20 }}
+                                                source={{ uri: item.sal_profile_pic }}
+
+                                            />
+                                            <Image
+                                                style={{ position: 'absolute', bottom: 0, width: 180, height: 200, }}
+                                                source={require('../../assets/salonShopMask.png')}
+                                            />
+                                            <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.sal_name}</Text>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${item?.sal_address + ", " + item?.sal_city + ", " + item?.sal_country}`);
+                                                }} style={{ flexDirection: 'row' }}>
+                                                <LocationIcon color="rgba(252, 252, 252, 0.5)" />
+                                                <Text
+                                                    numberOfLines={1}
+                                                    ellipsizeMode='tail'
+                                                    style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
+                                            </TouchableOpacity>
+                                            <Text style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_city}</Text>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                        <>
+                                                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF', marginRight: 2 }}>{item?.sal_ratings}</Text>
+                                                            <RattingStarIcon />
+                                                        </>
+                                                    }
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity >
+                                    )}
+                                />
+                            </>
+                        }
+                    </View>
+
+                    {/* Top Liked */}
                     {
-                        tabs.men &&
+                        topLiked?.length > 0 &&
                         <>
-                            <FlatList
-                                data={mensData}
-                                horizontal={true}
-                                style={{ marginTop: 10, }}
-                                keyExtractor={keyExtractor}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item, index }) => (
-                                    <SalonGridView item={item} index={index} />
-                                )}
-                            />
                             <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Recommended</Text>
-                                <TouchableOpacity>
+                                <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Top Liked</Text>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        navigate('ViewAll', {
+                                            data: {
+                                                data: topLiked,
+                                                title: "Top Liked"
+                                            }
+                                        })
+                                    }}
+                                >
                                     <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
                                 </TouchableOpacity>
                             </View>
-                            <FlatList
-                                data={recommended}
-                                horizontal={true}
-                                style={{ marginTop: 10, }}
-                                keyExtractor={keyExtractor}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item, index }) => (
-                                    <SalonGridView item={item} index={index} />
-                                )}
-                            />
-                        </>
-                    }
-                    {
-                        tabs.women &&
-                        <>
-                            <FlatList
-                                data={womensData}
-                                horizontal={true}
-                                style={{ marginTop: 10, }}
-                                keyExtractor={keyExtractor}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item, index }) => (
-                                    <SalonGridView item={item} index={index} />
-                                )}
-                            />
-                            <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17 }}>Recommended</Text>
-                                <TouchableOpacity>
-                                    <Text style={{ color: 'rgba(252, 252, 252, 0.7)', fontFamily: 'PRe', fontSize: 14 }}>view all</Text>
-                                </TouchableOpacity>
+                            <View style={styles.listingMargin}>
+                                <FlatList
+                                    data={topLiked}
+                                    horizontal={true}
+                                    style={{ marginTop: 10, }}
+                                    keyExtractor={keyExtractor}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                makeRecentSalons(item)
+                                                navigate('SalonDetails', item)
+                                            }}
+                                            style={{ width: 180, marginLeft: 15, height: 200, justifyContent: 'flex-end', paddingHorizontal: 10, paddingBottom: 10 }}>
+
+                                            <Image
+                                                style={{ position: 'absolute', width: 180, height: 200, borderRadius: 10, resizeMode: 'stretch' }}
+                                                source={{ uri: item.sal_profile_pic }}
+
+                                            />
+                                            <Image
+                                                style={{ position: 'absolute', bottom: 0, width: 188, height: 200 }}
+                                                source={require('../../assets/salonShopMask.png')}
+                                            />
+                                            <Text style={{ fontFamily: 'PMe', fontSize: 14, color: 'white' }}>{item.sal_name}</Text>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${item?.sal_address + ", " + itam?.sal_city + ", " + itam?.sal_country}`);
+                                                }} style={{ flexDirection: 'row' }}>
+                                                <LocationIcon color="rgba(252, 252, 252, 0.5)" />
+                                                <Text
+                                                    numberOfLines={1}
+                                                    ellipsizeMode='tail'
+                                                    style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_address}</Text>
+                                            </TouchableOpacity>
+                                            <Text style={{ fontFamily: 'PRe', fontSize: 10, color: 'rgba(252, 252, 252, 0.5)', marginLeft: 5, }}>{item.sal_city}</Text>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={{ fontFamily: 'PMe', fontSize: 14, color: '#FFFFFF', marginRight: 2 }}>{item?.fav_count}</Text>
+                                                    <AntDesign size={13} name='heart' color={"red"} />
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity >
+                                    )}
+                                />
                             </View>
-                            <FlatList
-                                data={recommended}
-                                horizontal={true}
-                                style={{ marginTop: 10, }}
-                                keyExtractor={keyExtractor}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item, index }) => (
-                                    <SalonGridView item={item} index={index} />
-                                )}
-                            />
                         </>
+
                     }
                 </ScrollView>
-            </View>
+            </View >
 
 
         </SafeAreaView >
@@ -492,6 +847,9 @@ const styles = StyleSheet.create({
         fontFamily: 'PRe',
         fontSize: 14,
         color: '#FFFFFF'
+    },
+    listingMargin: {
+        marginLeft: -15
     }
 })
 

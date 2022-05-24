@@ -87,7 +87,6 @@ function OnBoardingTabs() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} >
-      {/* <Stack.Screen name="SignUp" component={OTP} /> */}
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="OTP" component={OTP} />
       <Stack.Screen name="SignIn" component={SignIn} />
@@ -225,7 +224,7 @@ const useForceUpdate = () => {
 
 var alertRef;
 
-export default function App(props) {
+export default function Root(props) {
 
 
   const forceUpdate = useForceUpdate();
@@ -345,6 +344,7 @@ export default function App(props) {
 
 
   useEffect(() => {
+    handleNotificationClick();
     storeItem('recent_salons',[]);
     notificationListener.current = Notificationss.addNotificationResponseReceivedListener(response => {
       console.log("Notificationssss")
@@ -402,6 +402,7 @@ export default function App(props) {
     if (typeof notif?.request?.content?.data?.open != 'undefined') {
       navigateToPostNow.navigate({ id: notif?.request?.content?.data?.post_id, where: notif?.request?.content?.data?.open })
     }
+
     // if(notif?.request?.content?.data?.open=="user"){
     //     navigateToPostNow.navigate(notif?.request?.content?.data?.post_id)
     // }
@@ -409,7 +410,41 @@ export default function App(props) {
   }
 
 
- 
+  const handleNotificationClick = async ()=>{
+    navigateToPost.subscribe((t)=>{
+        console.log("honor received");
+        console.log(t);
+        if(t.where=="post"){
+            // navigation.navigate("PostDetails",{post_id:t.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="bubble"){
+            // navigation.navigate("BubbleDetails",{id:t.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="user"){
+            // navigation.navigate("OtherProfile",{user_id:t.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="chat"){
+            props.navigation.navigate("ChatDetails",{user_id:0,convo_id:t?.id,picUrl:"",name:"Loading",username:"Loading..."})
+            navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="content"){
+            // navigation.navigate("ContentDetails",{id:t?.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="highlight"){
+            // navigation.navigate("HighlightDetails",{id:t?.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+        if(t.where=="user"){
+            // navigation.navigate("Other",{id:t?.id})
+            // navigation.navigate("OtherProfile",{user:{},user_id:t?.id})
+            // navigateToPostNow.navigate({id:0,where:"nowhere"})
+        }
+    })
+}
 
 
 
@@ -423,9 +458,9 @@ export default function App(props) {
         ref={ref => alertRef = ref}
       />
 
-      <NavigationContainer
+      {/* <NavigationContainer
         ref={navigationRef}
-      >
+      > */}
         {/* <Stack.Navigator screenOptions={{ headerShown: false }} > */}
         {
           loggedIn == 2 &&

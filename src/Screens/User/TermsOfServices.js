@@ -27,29 +27,27 @@ const TermsOfServices = () => {
     const [data, setData] = useState('');
 
 
-    function getTermsOfServices() {
-        const postObj = { token: state?.userData?.token }
-        doConsole(postObj);
+    function getPage() {
+        const postObj = { slug : "terms-and-conditions" }
         setLoading(true)
-        apiRequest(postObj, 'terms_and_services')
+        apiRequest(postObj, 'get_page')
             .then(data => {
                 doConsole(data)
                 setLoading(false)
-                if (data.action == 'success') {
-                    setData(data.data);
+                if (data?.action == 'success') {
+                    setData(data.data?.content);
                 }
                 else {
-                    alertRef.alertWithType('error', 'Error', data.error);
+                    alertRef.alertWithType('error', 'Error', data?.error);
                 };
             })
             .catch(err => {
                 setLoading(false)
             })
-
     }
 
     useEffect(() => {
-        getTermsOfServices();
+        getPage();
     }, [])
 
     return (

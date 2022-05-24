@@ -85,12 +85,12 @@ const UserScreen = () => {
             </View>
             <ScrollView>
                 <View style={styles.containers}>
-                    <SettingView
+                    {/* <SettingView
                         text="Payment Methods"
                         icon={PaymentMethodIcon}
                         onPress={() => console.log('presed')}
                         navigateTo="EditPaymentMethod"
-                    />
+                    /> */}
                     <SettingView
                         text="Profile"
                         icon={ProfileIcon}

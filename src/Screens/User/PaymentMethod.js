@@ -50,6 +50,36 @@ const PaymentMethod = (props) => {
     // const { app_id } = props.route.params
     const [app_id, setAppId] = useState(props?.route?.params?.app_id ? props?.route?.params.app_id : 0)
 
+    function changeAppointStatus() {
+
+        const postObj = {
+            token: state?.userData?.token,
+            app_id: app_id
+        }
+        doConsole(postObj);
+        setLoading(true)
+        apiRequest(postObj, 'change_app_status_pending')
+            .then(data => {
+
+                doConsole(data)
+                setshown_suc(true);
+                setPaypalModal(false);
+                setStripeModal(false)
+                navigate('AppointBooked', props?.route?.params?.date);
+
+                setLoading(false)
+                if (data.action == 'success') {
+                    alertRef.alertWithType('success', 'Success', 'Your appointment .');
+                }
+                else {
+                    alertRef.alertWithType('error', 'Error', data.error);
+                };
+            })
+            .catch(err => {
+                setLoading(false)
+            })
+    }
+
     useEffect(() => {
         console.log(props.route.params)
     }, [])
@@ -64,10 +94,10 @@ const PaymentMethod = (props) => {
         if (paymentMethod == "stripe") {
             setStripeModal(true);
         }
-        else if (paymentMethod == "cashPayment") {
-            navigate('AppointBooked', props?.route?.params?.date);
-            // Alert.alert('This is cash payment');
-        }
+        // else if (paymentMethod == "cashPayment") {
+        //     navigate('AppointBooked', props?.route?.params?.date);
+        //     // Alert.alert('This is cash payment');
+        // }
 
     }
 
@@ -76,15 +106,12 @@ const PaymentMethod = (props) => {
         console.log(webViewState.url);
         console.log('parts')
         var parts = webViewState.url.split('/');
-        doConsole(parts);
-
-
+        console.log(parts)
         console.log(shown_suc)
         if ((parts[5] == "paypal_is_good") || parts[4] == "paypal_is_good" && !shown_suc) {
-            setshown_suc(true);
-            setPaypalModal(false);
-            setStripeModal(false)
-            navigate('AppointBooked', props?.route?.params?.date);
+            setLoading(true);
+            changeAppointStatus();
+
             // goOrder(parts[6]);
         }
     }
@@ -311,8 +338,7 @@ const PaymentMethod = (props) => {
                 backgroundColor={acolors.bgColor}
                 translucent={false}
             />
-            {loading && <Loader />}
-            <DropdownAlert ref={(ref) => alertRef = ref} />
+
             {_render_paypal()}
             {_render_stripe()}
 
@@ -366,7 +392,7 @@ const PaymentMethod = (props) => {
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() => {
                             // navigate('AppointBooked')
                             setPaymentMethod('cashPayment')
@@ -387,7 +413,7 @@ const PaymentMethod = (props) => {
                         <View style={{ position: 'absolute', right: 15 }}>
                             {paymentMethod == 'cashPayment' ? <MarkedIcon /> : <UnMarkedIcon />}
                         </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
 
 
@@ -407,7 +433,8 @@ const PaymentMethod = (props) => {
                 </ScrollView>
 
             </SafeAreaView>
-
+            {loading && <Loader />}
+            <DropdownAlert ref={(ref) => alertRef = ref} />
         </View>
     )
 }

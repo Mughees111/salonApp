@@ -98,9 +98,12 @@ const BookAppointment = (props) => {
 
     function get_salon_slots(date) {
 
-        var device_datetime_sql = currentDateObj.getTime();
-        //  currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
+        // var device_datetime_sql = currentDateObj.getTime();
+        var device_datetime_sql = formatDate(new Date()) + currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
         var service_time = 0;
+
+
+        // console.log(device_datetime_sql)
 
 
         const reqObj = {
@@ -109,9 +112,9 @@ const BookAppointment = (props) => {
             date: date ? date : formatDate(currentDateObj),
             service_time: getServicesTime(),
             appoint_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null,
-            device_datetime_sql,
+            device_datetime_sql
         }
-        // doConsole(reqObj)
+        doConsole(reqObj)
         setLoading(true)
         apiRequest(reqObj, 'get_salon_slots')
             .then(data => {
@@ -157,11 +160,11 @@ const BookAppointment = (props) => {
             app_date: selectedDate,
             app_est_duration: servicesTotal.servicesTime,
             app_start_time: arr[0].ss_start_time,
-            app_status: "pending",
+            app_status: "payment_pending",
             sal_id: props?.route?.params?.data?.sal_id,
             app_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null
         }
-        // doConsole(reqObj);
+        doConsole(reqObj);
         setLoading(true)
         // doConsole(props?.route?.params?.data?.mobile_pay);
         apiRequest(reqObj, 'book_appoint')
@@ -169,15 +172,15 @@ const BookAppointment = (props) => {
                 setLoading(false)
                 doConsole(data)
                 if (data.action == 'success') {
-                    alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
+                    // alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
                     // appointmnet object
-                    if (props?.route?.params?.data?.mobile_pay == '1') {
-                        navigate('PaymentMethod', {
-                            app_id: data.app_id,
-                            date: selectedDate + ", " + arr[0].ss_start_time
-                        })
-                    }
-                    else props.navigation.popToTop();
+                    // if (props?.route?.params?.data?.mobile_pay == '1') {
+                    navigate('PaymentMethod', {
+                        app_id: data.app_id,
+                        date: selectedDate + ", " + arr[0].ss_start_time
+                    })
+                    // }
+                    // else props.navigation.popToTop();
 
                     // navigate('AppointBooked', selectedDate + ", " + arr[0].ss_start_time);
                 }

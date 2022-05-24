@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useContext, useState, useEffect } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, Dimensions } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView, FlatList, ScrollView, Dimensions, Linking, Platform } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler';
 import { goBack, navigate, navigateFromStack } from '../../../Navigations';
 import { acolors } from '../../Components/AppColors';
@@ -8,13 +8,15 @@ import { ChatIcon, ArrowLeft, FilterIcon, LocationBtmIcon, LocationIcon, Notific
 import Reviews from '../../Components/Reviews';
 import { MainButton } from '../../Components/Buttons';
 // import { SliderBox } from "react-native-image-slider-box";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 
 import { apiRequest } from '../../utils/apiCalls';
 import { retrieveItem, useForceUpdate, doConsole } from '../../utils/functions';
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
+import Gallery from 'react-native-image-gallery';
+import ReactNativeModal from 'react-native-modal';
 
 var alertRef;
 
@@ -27,6 +29,8 @@ const SalonDetails = (props) => {
     const [salImgs, setSalImgs] = useState([]);
     const [sal_reviews, setSalReviews] = useState([]);
     const [sal_ratings, setSalRatings] = useState('');
+    const [openSlider, setOpenSlider] = useState(false)
+    const [initialImage, setInitialImage] = useState(0);
 
     const params = props.route.params;
     const [fav, setFav] = useState(params?.is_fav)
@@ -83,8 +87,8 @@ const SalonDetails = (props) => {
                     setSalImgs(data.imgs);
                     params.sal_services = data?.sal_services
                     doConsole(data)
-                    setSalReviews(data.sal_reviews);
-                    setSalRatings(data.sal_ratings);
+                    setSalReviews(data?.sal_reviews);
+                    setSalRatings(data?.sal_ratings);
                     forceUpdate();
                 }
                 else {
@@ -105,7 +109,7 @@ const SalonDetails = (props) => {
     }, [])
 
     const MakeReview = ({ number }) => {
-        console.log(number)
+        // console.log(number)
         var stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
@@ -188,18 +192,38 @@ const SalonDetails = (props) => {
 
                     <View style={{ flexDirection: 'row', flex: 1, paddingRight: 10 }}>
                         <Image
-                            style={{ marginLeft: 20, marginTop: 10, width: "25%", borderRadius: 10 }}
+                            style={{ marginLeft: 20, marginTop: 10, width: "27%", resizeMode: 'contain', borderRadius: 10 }}
                             source={{ uri: params?.sal_profile_pic }}
                         />
                         <View style={{ marginLeft: 15, marginTop: 7, flex: 1 }}>
                             <Text style={{ fontFamily: 'PMe', fontSize: 17, color: acolors.primary }}>{params?.sal_name}</Text>
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                    Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${params.sal_lat},${params.sal_lng}` + new Date().getSeconds())
+                                }}
+                                style={{ width: 27, position: 'absolute', top: 0, right: 0, height: 27, borderRadius: 27 / 2, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                <Entypo name='direction' size={16} />
+                            </TouchableOpacity>
+
                             <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF' }}>{params?.sal_contact_person}
                                 <Text style={{ color: 'rgba(255,255,255,0.5)' }}>(Owner)</Text>
                             </Text>
-                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 3 }}>{params?.sal_address}</Text>
+                            
+                            <TouchableOpacity onPress={() => {
+                                Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${params?.sal_address}`);
+                                // +", "+params?.sal_city+", "+ params?.sal_country
+                            }}>
+                                <Text style={{ fontFamily: 'PRe',textDecorationLine:'underline', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_address}</Text>
+                            </TouchableOpacity>
+                            <Text style={{ fontFamily: 'PRe', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_city}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                                <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{params?.sal_ratings}</Text>
-                                <RattingStarIcon />
+                                {params?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                    <>
+                                        <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{params?.sal_ratings}</Text>
+                                        <RattingStarIcon />
+                                    </>
+                                }
                                 <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{params?.distance} mi</Text>
                                 <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row' }}>
@@ -216,7 +240,11 @@ const SalonDetails = (props) => {
                                         style={{ width: 27, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                         <MsgIcon />
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            Linking.openURL(`tel:+${params?.sal_phone}`, '_blank');
+                                        }}
+                                        style={{ width: 27, marginLeft: 10, height: 27, borderRadius: 12.5, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center' }}>
                                         <PhoneIcon />
                                     </TouchableOpacity>
 
@@ -228,9 +256,58 @@ const SalonDetails = (props) => {
 
 
                     <View style={{ paddingHorizontal: 20, marginTop: 15, }}>
-                        <Text style={styles.headingText}>Description</Text>
-                        <Text style={[styles.simpleText, { lineHeight: 20 }]}>{params?.sal_description}</Text>
-                        <Text style={styles.headingText}>Schedule</Text>
+                        <Text style={styles.headingText}>About us</Text>
+                        <Text style={[styles.simpleText, { lineHeight: 20, }]}>{params?.sal_description}</Text>
+
+                        <MainButton
+                            btnStyle={{ marginTop: 15 }}
+                            onPress={() => {
+                                navigate('SeeAllServices', params)
+                            }
+                                // navigate('BookAppointment')}
+                            }
+                            text="Book Appointment"
+
+                        />
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                            <Text style={styles.headingText}>Services</Text>
+                            <TouchableOpacity
+                                onPress={() => navigate('SeeAllServices', params)}
+                            >
+                                <Text style={{ color: 'rgba(252, 252, 252, 0.9)', fontFamily: 'PMe', marginTop: 5, fontSize: 14 }}>See All</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {
+                            params?.sal_services?.map((item, i) => {
+                                if (i > 3) return null;
+                                return (
+                                    <TouchableOpacity
+                                        key={i}
+                                        onPress={() => {
+                                            doConsole(params)
+                                            let param = params;
+                                            param.addedService = item.id;
+                                            navigate('SeeAllServices', params);
+                                        }}
+                                        style={{ marginTop: 10, flexDirection: 'row', width: "100%", justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingHorizontal: 2, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+                                        <View style={{ width: "50%" }}>
+                                            <Text style={{ color: '#FCFCFC', fontSize: 15, fontFamily: 'PMe' }}>{item.s_name}</Text>
+                                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, fontFamily: 'PRe' }}>{item.s_time_mins} mins</Text>
+                                        </View>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>${item.s_price}</Text>
+                                            <View style={{ height: 29, paddingHorizontal: 10, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: 10, borderRadius: 4 }}>
+                                                <Text style={{ fontFamily: 'PMe', fontSize: 14, color: '#111111' }}>Add</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )
+                            })
+                        }
+
+                        <Text style={styles.headingText}>Opening hours</Text>
                         {
                             params?.sal_hours?.map((v, i) => {
                                 return (
@@ -249,39 +326,8 @@ const SalonDetails = (props) => {
                             })
                         }
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-                            <Text style={styles.headingText}>Service List</Text>
-                            <TouchableOpacity
-                                onPress={() => navigate('SeeAllServices', params)}
-                            >
-                                <Text style={{ color: 'rgba(252, 252, 252, 0.9)', fontFamily: 'PMe', marginTop: 5, fontSize: 14 }}>See All</Text>
-                            </TouchableOpacity>
-                        </View>
-                        {
-                            params?.sal_services?.map((item, i) => {
-                                if (i > 3) return null;
-                                return (
-                                    <TouchableOpacity
-                                        key={i}
-                                        onPress={() => {
-                                            // doConsole(params)
-                                            navigate('SeeAllServices', params)
-                                        }}
-                                        key={i} style={{ marginTop: 10, flexDirection: 'row', width: "100%", justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingHorizontal: 2, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
-                                        <View style={{ width: "50%" }}>
-                                            <Text style={{ color: '#FCFCFC', fontSize: 15, fontFamily: 'PMe' }}>{item.s_name}</Text>
-                                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 15, fontFamily: 'PRe' }}>{item.s_time_mins} mins</Text>
-                                        </View>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>${item.s_price}</Text>
-                                            <View style={{ height: 29, paddingHorizontal: 10, backgroundColor: acolors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: 10, borderRadius: 4 }}>
-                                                <Text style={{ fontFamily: 'PMe', fontSize: 14, color: '#111111' }}>Add</Text>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                )
-                            })
-                        }
+
+
 
 
                         {/* <ServicesView title="Peaceful Massage" />
@@ -293,6 +339,36 @@ const SalonDetails = (props) => {
                             style={{ width: "100%", resizeMode: 'stretch', marginTop: 20 }}
                             source={require('../../assets/map.png')}
                         /> */}
+
+                        <ReactNativeModal
+                            isVisible={openSlider}
+                            style={{ margin: 0, backgroundColor: 'red', flex: 1 }}
+                            onSwipeComplete={() => { setOpenSlider(false) }}
+                            swipeDirection="down"
+                            onBackButtonPress={() => { setOpenSlider(false) }}
+
+                        >
+
+
+
+                            <Gallery
+                                style={{ flex: 1, backgroundColor: 'black' }}
+                                initialPage={initialImage}
+                                images={
+                                    salImgs.map((v) => {
+                                        return { source: { uri: v.img } }
+                                    })
+                                }
+                            />
+
+                            <TouchableOpacity
+                                onPress={() => setOpenSlider(false)}
+                                style={{ position: 'absolute', top: 20, left: 20, width: 34, height: 34, borderRadius: 34 / 2, backgroundColor: 'rgba(255,255,255,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+                                <ArrowLeft />
+                            </TouchableOpacity>
+
+                        </ReactNativeModal>
+
                         <Text style={styles.headingText}>Photos</Text>
                         <FlatList
                             style={{ marginTop: 10 }}
@@ -301,21 +377,26 @@ const SalonDetails = (props) => {
                             horizontal={true}
                             data={salImgs}
 
-                            renderItem={({ item }) => (
-                                <Image
-                                    style={{ width: 79, height: 69, borderRadius: 5, marginLeft: 10, borderRadius: 8 }}
-                                    source={{ uri: item.img }}
-                                />
+                            renderItem={({ item, index }) => (
+                                <TouchableOpacity onPress={() => {
+                                    setOpenSlider(true)
+                                    setInitialImage(index)
+                                }}>
+                                    <Image
+                                        style={{ width: 79, height: 69, borderRadius: 5, marginLeft: 10, borderRadius: 8 }}
+                                        source={{ uri: item.img }}
+                                    />
+                                </TouchableOpacity>
                             )}
                         />
                         <TouchableOpacity
-                            style={{marginTop:15}}
-                            onPress={()=>navigate('HealthSafety',params?.sal_id)}
+                            style={{ marginTop: 15 }}
+                            onPress={() => navigate('HealthSafety', params?.sal_id)}
                         >
                             <Text style={[styles.headingText, { textDecorationLine: 'underline' }]}>Salon Health and Safety Rules</Text>
                         </TouchableOpacity>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20, }}>
-                            <Text style={{ fontSize: 17, fontFamily: 'PMe', color: 'white' }}>Reviews ({sal_reviews.length})</Text>
+                            <Text style={styles.headingText}>Reviews ({sal_reviews.length})</Text>
                             {sal_reviews.length > 0 &&
                                 < View style={{ position: 'absolute', right: 0, }}>
                                     <MakeReview width={20} number={sal_ratings} />
@@ -347,7 +428,7 @@ const SalonDetails = (props) => {
 
                                 <TouchableOpacity
                                     onPress={() => {
-                                        console.log('pressed')
+                                        // console.log('pressed')
                                         navigate('AllReviews', sal_reviews)
                                     }}
                                 >
@@ -355,16 +436,7 @@ const SalonDetails = (props) => {
                                 </TouchableOpacity>
                             </>
                         }
-                        <MainButton
-                            btnStyle={{ marginTop: 15 }}
-                            onPress={() => {
-                                navigate('SeeAllServices', params)
-                            }
-                                // navigate('BookAppointment')}
-                            }
-                            text="Book Appointment"
 
-                        />
                     </View>
                 </ScrollView>
             </SafeAreaView>
@@ -377,8 +449,8 @@ const styles = StyleSheet.create({
     headingText: {
         marginTop: 5,
         fontSize: 17,
-        fontFamily: 'PMe',
-        color: 'white'
+        fontFamily: 'PSBo',
+        color: acolors.primary
     },
 
     simpleText: {

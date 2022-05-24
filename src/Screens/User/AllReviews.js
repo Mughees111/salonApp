@@ -48,7 +48,7 @@ const AllReviews = (props) => {
                         <Text>          </Text>
                     </View>
                     
-                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Here are all the review</Text>
+                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: "#FCFCFC", marginTop: 20, }}>Reviews</Text>
                     <FlatList
                         keyExtractor={keyExtractor}
                         data={data}
