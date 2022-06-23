@@ -350,7 +350,7 @@ const SignIn = () => {
                             style={{ marginTop: 30 }}
                             onPress={() => navigate('SignUp')}
                         >
-                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Don’t have an account? Sign Up</Text>
+                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Don’t have an account? <Text style={{color:acolors.primary}}>Sign Up</Text></Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

@@ -553,7 +553,8 @@ const SignUp = () => {
                                 navigate('SignIn')
                             }}
                         >
-                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Already have an account? Sign In</Text>
+                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Already have an account?<Text style={{color:acolors.primary}}> Sign In</Text></Text> 
+                            
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

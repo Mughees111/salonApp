@@ -42,7 +42,7 @@ const NearBy = () => {
     const keyExtractor = ((item, index) => index.toString())
     const [nearByData, setNearByData] = useState([])
 
-    const production = true;
+    const production = false;
     const GOOGLE_MAPS = production ? "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
 
 

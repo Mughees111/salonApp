@@ -56,6 +56,7 @@ const PaymentMethod = (props) => {
             token: state?.userData?.token,
             app_id: app_id
         }
+        console.log('calling 1')
         doConsole(postObj);
         setLoading(true)
         apiRequest(postObj, 'change_app_status_pending')
@@ -79,10 +80,6 @@ const PaymentMethod = (props) => {
                 setLoading(false)
             })
     }
-
-    useEffect(() => {
-        console.log(props.route.params)
-    }, [])
 
     const tryPayment = () => {
 
@@ -109,7 +106,9 @@ const PaymentMethod = (props) => {
         console.log(parts)
         console.log(shown_suc)
         if ((parts[5] == "paypal_is_good") || parts[4] == "paypal_is_good" && !shown_suc) {
+            console.log('-------done');
             setLoading(true);
+            setshown_suc(true);
             changeAppointStatus();
 
             // goOrder(parts[6]);
@@ -217,6 +216,7 @@ const PaymentMethod = (props) => {
 
         )
     }
+
     const _render_stripe = () => {
         const jsCode = `(function() {
             var originalPostMessage = window.postMessage;
@@ -286,7 +286,7 @@ const PaymentMethod = (props) => {
                                         fontWeight: "bold",
                                         color: "#fff"
                                     }}>
-                                        Stripe
+                                        Credit/Debit Card
                                     </Text>
 
                                 </View>

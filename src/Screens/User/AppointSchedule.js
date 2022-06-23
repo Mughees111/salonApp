@@ -67,14 +67,38 @@ const AppointSchedule = () => {
             })
     }
 
-    function doCancelAppoint(app_id) {
+    function doCancelAppoint(app_id,status) {
+        const reqObj = {
+            token: state?.userData?.token,
+            app_id: app_id,
+            app_status: status ?? null
+        }
+        // doConsole(state.userLocation);
+        setLoading(true)
+        apiRequest(reqObj, 'cancel_appoint')
+            .then(data => {
+                if (data.action == 'success') {
+                    getAppointments()
+                    alertRef.alertWithType("success", "Success", data.msg);
+                }
+                else {
+                    setLoading(false)
+                    alertRef.alertWithType("error", "Error", data.error);
+                }
+            })
+            .catch(err => {
+                setLoading(false)
+            })
+    }
+
+    function doApproveRescheduleAppoint(app_id) {
         const reqObj = {
             token: state?.userData?.token,
             app_id: app_id,
         }
-        doConsole(state.userLocation);
+        // doConsole(state.userLocation);
         setLoading(true)
-        apiRequest(reqObj, 'cancel_appoint')
+        apiRequest(reqObj, 'approve_reschedule')
             .then(data => {
                 if (data.action == 'success') {
                     getAppointments()
@@ -332,23 +356,35 @@ const AppointSchedule = () => {
                                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
                                             <TouchableOpacity
                                                 onPress={() => {
+                                                    let cancelWord = item.app_status == 'reschedule' ? "reject" : "cancel";
                                                     Alert.alert(
-                                                        "Are you sure you want to cancel this appointment",
+                                                        `Are you sure you want to ${cancelWord} this appointment`,
                                                         '',
 
                                                         [
-                                                            { text: 'Yes', onPress: () => doCancelAppoint(item.app_id) },
+                                                            { text: 'Yes', onPress: () => doCancelAppoint(item.app_id, cancelWord == 'reject' ? "reschedule rejected" : null) },
 
-                                                            { text: 'Cancel', },
+                                                            { text: 'No', },
                                                         ],
                                                         { cancelable: true },
                                                     );
 
                                                 }}
-                                                style={{ width: 115, paddingVertical: 10, alignItems: 'center', borderRadius: 8, borderWidth: 1, borderColor: '#F95959', }}>
-                                                <Text style={{ color: '#FCFCFC', fontFamily: 'PRe', fontSize: 16 }}>Cancel</Text>
+                                                style={{ width: "48%", paddingVertical: 10, alignItems: 'center', borderRadius: 8, borderWidth: 1, borderColor: '#F95959', }}>
+                                                <Text style={{ color: '#FCFCFC', fontFamily: 'PRe', fontSize: item.app_status == 'reschedule' ? 12: 16 }}>{item.app_status == 'reschedule' ? "Reject Reschedule " : "Cancel"} </Text>
                                             </TouchableOpacity>
                                             {
+                                                item.app_status == 'reschedule' &&
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            // doConsole(item)
+                                                            doApproveRescheduleAppoint(item.app_id)
+                                                        }}
+                                                        style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: "48%", alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 12 }}>Approve Reschedule</Text>
+                                                    </TouchableOpacity>
+                                            }
+                                            {/* {
                                                 item.is_paid != '1' &&
 
                                                 <TouchableOpacity
@@ -368,8 +404,17 @@ const AppointSchedule = () => {
                                                     style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: 126, alignItems: 'center', justifyContent: 'center' }}>
                                                     <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 16 }}>Reschedule</Text>
                                                 </TouchableOpacity>
-                                            }
+                                            } */}
                                         </View>
+                                        {
+                                            item.app_status != 'reschedule' &&  
+                                            <TouchableOpacity
+                                                onPress={() => navigate('CancellationPolicy',{ data: item.cancellation_policy })}
+                                                style={{ width: "100%", borderRadius: 8, marginTop: 10, paddingVertical: 10, paddingHorizontal: 10, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.3)' }}>
+                                                <MarkerCancel />
+                                                <Text style={{ fontFamily: 'PMe', fontSize: 10, color: 'white', marginLeft: 5 }}>Read cancellation policy</Text>
+                                            </TouchableOpacity>
+                                        }
                                     </View>
                                 )
                             }}
@@ -561,12 +606,12 @@ const AppointSchedule = () => {
                                                 </TouchableOpacity>
                                             }
                                         </View>
-                                        {/* <TouchableOpacity
-                                            onPress={() => navigate('CancellationPolicy')}
+                                        <TouchableOpacity
+                                            onPress={() => navigate('CancellationPolicy',{ data: item.cancellation_policy })}
                                             style={{ width: "100%", borderRadius: 8, marginTop: 10, paddingVertical: 10, paddingHorizontal: 10, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.3)' }}>
                                             <MarkerCancel />
                                             <Text style={{ fontFamily: 'PMe', fontSize: 10, color: 'white', marginLeft: 5 }}>Read cancellation policy</Text>
-                                        </TouchableOpacity> */}
+                                        </TouchableOpacity>
                                     </View>
                                 )
                             }}

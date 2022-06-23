@@ -36,7 +36,7 @@ const Home = (props) => {
     const { state, setUserGlobal, setUserLocationGlobal } = useContext(Context);
     const [loading, setLoading] = useState(false);
 
-    const [tabs, setTabs] = useState({ men: true, women: false })
+    const [tabs, setTabs] = useState({ men: false, women: true })
     const [mensData, setMensData] = useState([]);
     const [womensData, setWomensData] = useState([]);
     const [recommended, setRecommended] = useState([]);
@@ -55,10 +55,11 @@ const Home = (props) => {
 
 
     const [shortAddress, setShortAddress] = useState('Loading');
-    const production = true;
+    const production = false;
     // "AIzaSyBmiOF9IRt8QsTVZCh5zQbzCDEuART1_NU"
+    // const MAPS_KEY = production ? "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
     const MAPS_KEY = production ? "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo" : "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8";
-
+    
 
 
     const onRefresh = React.useCallback(() => {
@@ -92,7 +93,7 @@ const Home = (props) => {
         var lat;
         var lng;
         if (state?.userLocation?.coords?.latitude) {
-            // console.log('yes i have user location in state');
+            console.log('yes i have user location in state');
             lat = state.userLocation?.coords?.latitude;
             lng = state.userLocation?.coords?.longitude;
         }
@@ -105,7 +106,7 @@ const Home = (props) => {
             else {
                 setFirstHeading('Professionals near you')
             }
-
+            
             try {
                 var locationn = await Location.getCurrentPositionAsync({});
             }
@@ -125,14 +126,17 @@ const Home = (props) => {
             lng = locationn?.coords?.longitude;
             setUserLocationGlobal(locationn)
         }
+        console.log(locationn)
 
 
         if (shortAddress == 'Loading' || shortAddress == '') {
-            let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationn?.coords?.latitude},${locationn?.coords?.longitude}&key=${MAPS_KEY}`;
+            let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${MAPS_KEY}`;
+            console.log(url)
             fetch(url)
                 .then(data => data.json())
                 .then(data => {
                     if (data.results) {
+                        console.log('here is result',data.result)
                         makeShortTitle(data.results[0].address_components);
                     }
                     else {
@@ -164,7 +168,7 @@ const Home = (props) => {
 
         apiRequest(postObj, 'get_salons')
             .then(data => {
-                console.log(data)
+                
                 setLoading(false)
                 setRefreshing(false);
                 if (data.action == 'success') {
@@ -201,7 +205,7 @@ const Home = (props) => {
         })
 
         if (found) {
-            // console.log(`short title: ${title}`)
+            console.log(`short title: ${title}`)
             setShortAddress(title);
             forceUpdate();
             return title
@@ -311,7 +315,6 @@ const Home = (props) => {
             if (data) {
                 apiRequest({ token: data.token }, 'get_notifs_count')
                     .then(data => {
-                        console.log(data)
                         if (data.action == 'success') {
                             setNotifCount(data?.notifs)
                         }
@@ -521,22 +524,22 @@ const Home = (props) => {
                     <TouchableOpacity
                         onPress={() => {
                             setTabs({
-                                men: true,
-                                women: false
-                            })
-                        }}
-                        style={[tabs.men ? styles.activeTab : styles.inActiveTab, { borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }]} >
-                        <Text style={tabs.men ? styles.activeTabText : styles.inActiveTabText}>Men</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => {
-                            setTabs({
                                 men: false,
                                 women: true
                             })
                         }}
                         style={[tabs.women ? styles.activeTab : styles.inActiveTab, { borderTopRightRadius: 8, borderBottomRightRadius: 8 }]} >
                         <Text style={tabs.women ? styles.activeTabText : styles.inActiveTabText}>Women</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => {
+                            setTabs({
+                                men: true,
+                                women: false
+                            })
+                        }}
+                        style={[tabs.men ? styles.activeTab : styles.inActiveTab, { borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }]} >
+                        <Text style={tabs.men ? styles.activeTabText : styles.inActiveTabText}>Men</Text>
                     </TouchableOpacity>
                 </View>
                 <ScrollView
@@ -678,7 +681,7 @@ const Home = (props) => {
                             recentSalons?.length > 0 &&
                             <>
                                 <View style={{ marginTop: 15, width: "100%", flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17,marginLeft:8 }}>Recently Viewed</Text>
+                                    <Text style={{ color: 'white', fontFamily: 'PMe', fontSize: 17,marginLeft:14 }}>Recently Viewed</Text>
                                     <TouchableOpacity
                                         onPress={() => {
                                             navigate('ViewAll', {
@@ -854,3 +857,7 @@ const styles = StyleSheet.create({
 })
 
 export default Home
+
+
+
+//app.json map api key "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo"

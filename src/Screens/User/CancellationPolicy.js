@@ -19,7 +19,7 @@ import { Context } from '../../Context/DataContext';
 
 var alertRef;
 
-const CancellationPolicy = () => {
+const CancellationPolicy = (props) => {
 
     const forceUpdate = useForceUpdate();
     const { state, setUserGlobal } = useContext(Context);
@@ -28,23 +28,24 @@ const CancellationPolicy = () => {
 
 
     function get_cancellation_policy() {
-        const postObj = { token: state?.userData?.token }
-        doConsole(postObj);
-        setLoading(true)
-        apiRequest(postObj, 'get_cancellation_policy')
-            .then(data => {
-                doConsole(data)
-                setLoading(false)
-                if (data.action == 'success') {
-                    setData(data.data);
-                }
-                else {
-                    alertRef.alertWithType('error', 'Error', data.error);
-                };
-            })
-            .catch(err => {
-                setLoading(false)
-            })
+        setData(props.route.params?.data);
+        // const postObj = { token: state?.userData?.token }
+        // doConsole(postObj);
+        // setLoading(true)
+        // apiRequest(postObj, 'get_cancellation_policy')
+        //     .then(data => {
+        //         doConsole(data)
+        //         setLoading(false);
+        //         if (data.action == 'success') {
+        //             setData(data.data);
+        //         }
+        //         else {
+        //             alertRef.alertWithType('error', 'Error', data.error);
+        //         };
+        //     })
+        //     .catch(err => {
+        //         setLoading(false)
+        //     })
 
     }
 

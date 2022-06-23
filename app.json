@@ -48,7 +48,8 @@
       "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBSw0D88sjoodik8ALNNMhccUL-WQbpwJo"
+          "apiKey": "AIzaSyA1R8WBbKJnXN6Wbwc8Tq1rCIK_sT3_FO8"
+          
         },
         "googleSignIn": {
           "apiKey": "AIzaSyCXgqD7LDRA82zMLu3KKyY_8FT_9U49qKk",
