@@ -16,12 +16,13 @@ import { retrieveItem, useForceUpdate, doConsole } from '../../utils/functions';
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
+import { allStacks } from '../../../Common';
 
 var alertRef;
 
 
 
-const Notifications = () => {
+const Notifications = (props) => {
 
 
 
@@ -54,6 +55,21 @@ const Notifications = () => {
                         setLoading(false)
                     })
             })
+    }
+
+
+    function getParentByScreen(screen) {
+        let getScreenId = '';
+        for (let key of allStacks) {
+            if (key.name == screen) {
+                getScreenId = key.parent;
+                break;
+            }
+        }
+        let stackName = allStacks.find((v) => v.id == getScreenId);
+        return stackName?.name
+
+
     }
 
     useEffect(() => {
@@ -94,8 +110,16 @@ const Notifications = () => {
                                 activeOpacity={item.screen ? 0 : 1}
                                 style={{ width: "100%", paddingVertical: 12, paddingHorizontal: 15, marginTop: 12, backgroundColor: 'black', borderRadius: 10 }}
                                 onPress={() => {
-                                    const date = item.date_time.split(' ');
-                                    item.screen && navigateFromStack('AppintmentsStack')
+                                    // const date = item.date_time.split(' ');
+                                    const params = {
+                                        data : item.data
+                                    }
+                                    if(item.data.screen == 'AppointSchedule'){
+                                        navigate(item.data.screen, params);
+                                        return;
+                                    }
+                                    const stackName = getParentByScreen(item.data.screen);
+                                    item.data?.screen && navigateFromStack(stackName, item.data.screen, params);
                                 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Text style={{ fontFamily: 'PMe', fontSize: 14.62, color: acolors.primary }}>{item?.title}</Text>

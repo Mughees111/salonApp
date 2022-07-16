@@ -490,7 +490,7 @@ const Home = (props) => {
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, }}>
-                        <View style={{ width: "100%", height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, paddingHorizontal: 10, alignItems: 'center', flexDirection: 'row' }}>
+                        <View style={{ width: "85%", height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, paddingHorizontal: 10, alignItems: 'center', flexDirection: 'row' }}>
                             <TouchableOpacity>
                                 <SearchIcon />
                             </TouchableOpacity>
@@ -511,11 +511,11 @@ const Home = (props) => {
                                 style={{ marginLeft: 10, color: 'rgba(252, 252, 252, 1)', fontFamily: 'PRe', flex: 1 }}
                             />
                         </View>
-                        {/* <TouchableOpacity
+                        <TouchableOpacity
                             onPress={() => navigate('Categories')}
                             style={{ paddingHorizontal: 10, height: 42, borderWidth: 1, borderColor: 'white', borderRadius: 8, alignItems: 'center', justifyContent: 'center', }}>
                             <FilterIcon />
-                        </TouchableOpacity> */}
+                        </TouchableOpacity>
                     </View>
                 </View>
             </SafeAreaView>

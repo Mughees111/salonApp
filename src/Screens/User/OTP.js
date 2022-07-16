@@ -27,7 +27,6 @@ const OTP = (props) => {
     const [loading, setLoading] = useState(false)
 
     function verifyOTP() {
-
         setLoading(true)
         const reqObj = {
             code: otp,
@@ -58,9 +57,9 @@ const OTP = (props) => {
                             }
                         })
                         .catch(err => {
-                            setLoading(false)
+                            setLoading(false);
                             alertRef.alertWithType("error", "Error", 'Network Error');
-                            console.log(err)
+                            console.log(err);
                         })
 
                 }

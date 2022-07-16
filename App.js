@@ -68,6 +68,8 @@ const Stack = createStackNavigator()
 const BottomTabs = createMaterialBottomTabNavigator();
 
 
+
+
 function OnBoardingTabs() {
   return (
     <OnBoarding.Navigator
@@ -127,6 +129,7 @@ function HomeStack() {
       <Stack.Screen name="PaypalAccount" component={PaypalAccount} />
       <Stack.Screen name="EditPayPalDetails" component={EditPayPalDetails} />
       <Stack.Screen name="AddCardDetails" component={AddCardDetails} />
+      <Stack.Screen name='AppointSchedule' component={AppointSchedule} />
 
       <Stack.Screen name="UserChatNavigator" component={UserChatNavigator} />
     </Stack.Navigator>
@@ -232,7 +235,7 @@ export default function App(props) {
 
   const [loggedIn, setLoggedIn] = useState(0)
 
-  
+
 
 
 
@@ -345,7 +348,7 @@ export default function App(props) {
 
 
   useEffect(() => {
-    storeItem('recent_salons',[]);
+    storeItem('recent_salons', []);
     notificationListener.current = Notificationss.addNotificationResponseReceivedListener(response => {
       console.log("Notificationssss")
       console.log(response);
@@ -409,7 +412,7 @@ export default function App(props) {
   }
 
 
- 
+
 
 
 

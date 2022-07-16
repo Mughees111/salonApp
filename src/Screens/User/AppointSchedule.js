@@ -26,10 +26,11 @@ var alertRef;
 
 
 
-const AppointSchedule = () => {
+const AppointSchedule = (props) => {
 
     const forceUpdate = useForceUpdate();
     const { state, setUserGlobal } = useContext(Context);
+    const filterFlatListRef = React.useRef();
     const [loading, setLoading] = useState(false);
     const [tabs, setTabs] = useState('pendings');
     const [pendings, setPendings] = useState([]);
@@ -42,20 +43,51 @@ const AppointSchedule = () => {
     const [app_review, setAppReview] = useState('')
     const [appDataForUpdate, setAppDataForUpdate] = useState();
     const [refresh, setRefresh] = useState(false);
+    const [isDoneScrolling, setIsDoneScrolling] = useState(false);
 
-    function getAppointments() {
-
+    function getAppointments(id) {
         const reqObj = {
             token: state?.userData?.token,
             lat: state?.userLocation?.coords?.latitude,
             lng: state?.userLocation?.coords?.lng,
         }
-        doConsole(state.userLocation);
         setLoading(true)
         apiRequest(reqObj, 'get_appoints')
             .then(data => {
                 setLoading(false)
                 if (data.action == 'success') {
+                    if (id) {
+                        let done = false;
+                        for (let key of data?.pendings) {
+                            if (key.app_id == id) {
+                                console.log('this is the id', key)
+                                setTabs('pendings');
+                                key.toScroll = true;
+                                done = true;
+                                break;
+                            }
+                        }
+                        if (!done) {
+                            for (let key of data?.scheduled) {
+                                if (key.app_id == id) {
+                                    setTabs('scheduled');
+                                    key.toScroll = true;
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!done) {
+                            for (let key of data?.history) {
+                                if (key.app_id == id) {
+                                    setTabs('history');
+                                    key.toScroll = true;
+                                    done = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     setHistory(data.history);
                     setPendings(data.pendings);
                     setScheduled(data.scheduled);
@@ -67,13 +99,12 @@ const AppointSchedule = () => {
             })
     }
 
-    function doCancelAppoint(app_id,status) {
+    function doCancelAppoint(app_id, status) {
         const reqObj = {
             token: state?.userData?.token,
             app_id: app_id,
             app_status: status ?? null
         }
-        // doConsole(state.userLocation);
         setLoading(true)
         apiRequest(reqObj, 'cancel_appoint')
             .then(data => {
@@ -96,7 +127,6 @@ const AppointSchedule = () => {
             token: state?.userData?.token,
             app_id: app_id,
         }
-        // doConsole(state.userLocation);
         setLoading(true)
         apiRequest(reqObj, 'approve_reschedule')
             .then(data => {
@@ -125,7 +155,6 @@ const AppointSchedule = () => {
             user: true,
             app_status: "completed & reviewed"
         }
-        doConsole(reqObj);
         setLoading(true)
 
         apiRequest(reqObj, 'complete_app')
@@ -144,10 +173,31 @@ const AppointSchedule = () => {
 
     }
 
+    function scrollToIndexNow(index) {
+        console.log('index', index)
+        setIsDoneScrolling(true)
+        setTimeout(() => filterFlatListRef.current.scrollToIndex({ index: index || 0 }), 120)
+
+    }
+
+    const getItemLayout = (data, index) => (
+        { length: 480, offset: tabs == 'history' ? 600 : 500 * index, index }
+    )
+
 
 
     useFocusEffect(useCallback(() => {
-        getAppointments()
+        forceUpdate();
+        var id = props.route?.params?.data?.post_id ? props.route?.params?.data?.post_id : null;
+        console.log('id == ', id)
+        getAppointments(id);
+        return () => {
+            setPendings([]);
+            setHistory([]);
+            setScheduled([]);
+            setIsDoneScrolling(false);
+            setTabs('pendings');
+        }
     }, [refresh],
     ))
 
@@ -185,7 +235,6 @@ const AppointSchedule = () => {
             stars.push(
                 <TouchableOpacity
                     onPress={() => {
-                        console.log(i)
                         setAppRating(i)
                         // j = i
                         forceUpdate();
@@ -201,6 +250,7 @@ const AppointSchedule = () => {
         return <View style={{ flexDirection: 'row' }}>{stars}</View>
 
     }
+
 
 
 
@@ -262,16 +312,20 @@ const AppointSchedule = () => {
                         tabs == 'pendings' &&
                         <FlatList
                             data={pendings}
+                            ref={filterFlatListRef}
+                            getItemLayout={getItemLayout}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={{ paddingBottom: 200 }}
                             renderItem={({ item, index }) => {
+                                item.toScroll && !isDoneScrolling && scrollToIndexNow(index);
                                 // var services = item.app_services.split(",");
                                 return (
-                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8, borderWidth: item.toScroll ? 1 : 0, borderColor: 'white' }}>
+                                        
                                         {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
-                                            onPress={() => console.log(item)}
+                                            // onPress={() => console.log(item)}
                                             style={{ flexDirection: 'row', backgroundColor: '#1B1B1B', width: "100%", borderRadius: 8, }}>
                                             <Image
                                                 style={{ height: 85, width: "28%", resizeMode: 'stretch', borderRadius: 12 }}
@@ -345,7 +399,7 @@ const AppointSchedule = () => {
                                         <View style={{ width: "110%", marginLeft: "-5%", paddingHorizontal: -20, height: 1, borderWidth: 1, borderStyle: 'dashed', borderColor: "rgba(255, 255, 255, 0.1)", marginTop: 20 }}></View>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Payment Method</Text>
-                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.payment_method}</Text>
+                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.payment_method == 'stripe' ? "Credit/Debit" : item.payment_method}</Text>
                                         </View>
                                         <View style={{ width: "110%", marginLeft: "-5%", paddingHorizontal: -20, height: 1, borderWidth: 1, borderStyle: 'dashed', borderColor: "rgba(255, 255, 255, 0.1)", marginTop: 20 }}></View>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
@@ -353,8 +407,8 @@ const AppointSchedule = () => {
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, }}>{item?.is_paid == 1 ? item?.app_price : "0"}</Text>
                                         </View>
 
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15 }}>
-                                            <TouchableOpacity
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 15, flexWrap: 'wrap' }}>
+                                            {/* <TouchableOpacity
                                                 onPress={() => {
                                                     let cancelWord = item.app_status == 'reschedule' ? "reject" : "cancel";
                                                     Alert.alert(
@@ -371,45 +425,60 @@ const AppointSchedule = () => {
 
                                                 }}
                                                 style={{ width: "48%", paddingVertical: 10, alignItems: 'center', borderRadius: 8, borderWidth: 1, borderColor: '#F95959', }}>
-                                                <Text style={{ color: '#FCFCFC', fontFamily: 'PRe', fontSize: item.app_status == 'reschedule' ? 12: 16 }}>{item.app_status == 'reschedule' ? "Reject Reschedule " : "Cancel"} </Text>
+                                                <Text style={{ color: '#FCFCFC', fontFamily: 'PRe', fontSize: item.app_status == 'reschedule' ? 12 : 16 }}>{item.app_status == 'reschedule' ? "Reject Reschedule " : "Cancel"} </Text>
+                                            </TouchableOpacity> */}
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    Alert.alert(
+                                                        `Are you sure you want to cancel this appointment`,
+                                                        '',
+
+                                                        [
+                                                            { text: 'Yes', onPress: () => doCancelAppoint(item.app_id) },
+
+                                                            { text: 'No', },
+                                                        ],
+                                                        { cancelable: true },
+                                                    );
+
+                                                }}
+                                                style={{ width: "48%", paddingVertical: 10, alignItems: 'center', borderRadius: 8, borderWidth: 1, borderColor: '#F95959', }}>
+                                                <Text style={{ color: '#FCFCFC', fontFamily: 'PRe', fontSize: 16 }}>Cancel </Text>
                                             </TouchableOpacity>
                                             {
                                                 item.app_status == 'reschedule' &&
-                                                    <TouchableOpacity
-                                                        onPress={() => {
-                                                            // doConsole(item)
-                                                            doApproveRescheduleAppoint(item.app_id)
-                                                        }}
-                                                        style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: "48%", alignItems: 'center', justifyContent: 'center' }}>
-                                                        <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 12 }}>Approve Reschedule</Text>
-                                                    </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        doApproveRescheduleAppoint(item.app_id)
+                                                    }}
+                                                    style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: "48%", alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 12 }}>Approve Reschedule</Text>
+                                                </TouchableOpacity>
                                             }
-                                            {/* {
-                                                item.is_paid != '1' &&
+                                            {
+                                                item.app_status == 'reschedule' &&
 
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        // doConsole(item)
                                                         let makeBookedServices = item.app_services.split(",");
-                                                        doConsole(makeBookedServices);
                                                         for (let i = 0; i < item.sal_services.length; i++) {
                                                             if (makeBookedServices.includes(item.sal_services[i].s_name)) {
                                                                 item.sal_services[i].isAdded = true
 
                                                             }
                                                         }
+                                                        item.status = 'reschedule_by_customer';
                                                         navigate('SeeAllServices', item)
-                                                        doConsole(item.sal_services)
                                                     }}
-                                                    style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: 126, alignItems: 'center', justifyContent: 'center' }}>
+                                                    style={{ alignSelf: 'flex-end', paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: 126, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
                                                     <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 16 }}>Reschedule</Text>
                                                 </TouchableOpacity>
-                                            } */}
+                                            }
                                         </View>
                                         {
-                                            item.app_status != 'reschedule' &&  
+                                            item.app_status != 'reschedule' &&
                                             <TouchableOpacity
-                                                onPress={() => navigate('CancellationPolicy',{ data: item.cancellation_policy })}
+                                                onPress={() => navigate('CancellationPolicy', { data: item.cancellation_policy })}
                                                 style={{ width: "100%", borderRadius: 8, marginTop: 10, paddingVertical: 10, paddingHorizontal: 10, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.3)' }}>
                                                 <MarkerCancel />
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 10, color: 'white', marginLeft: 5 }}>Read cancellation policy</Text>
@@ -425,17 +494,17 @@ const AppointSchedule = () => {
 
                     {
                         tabs == 'scheduled' &&
-
-
-
                         <FlatList
                             data={scheduled}
+                            ref={filterFlatListRef}
+                            getItemLayout={getItemLayout}
                             keyExtractor={(item, index) => index.toString()}
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={{ paddingBottom: 200 }}
                             renderItem={({ item, index }) => {
+                                item.toScroll && !isDoneScrolling && scrollToIndexNow(index);
                                 return (
-                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8, borderWidth: item.toScroll ? 1 : 0, borderColor: 'white' }}>
                                         {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
@@ -510,7 +579,7 @@ const AppointSchedule = () => {
                                         <View style={{ width: "110%", marginLeft: "-5%", paddingHorizontal: -20, height: 1, borderWidth: 1, borderStyle: 'dashed', borderColor: "rgba(255, 255, 255, 0.1)", marginTop: 20 }}></View>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
                                             <Text style={{ fontFamily: 'PMe', fontSize: 15, color: '#FCFCFC', }}>Payment Method</Text>
-                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.payment_method}</Text>
+                                            <Text style={{ fontFamily: 'PMe', fontSize: 15, color: acolors.primary, textTransform: 'capitalize' }}>{item.payment_method == 'stripe' ? "Credit/Debit" : item.payment_method}</Text>
                                         </View>
 
                                         {/* <TouchableOpacity
@@ -589,9 +658,7 @@ const AppointSchedule = () => {
 
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        // doConsole(item)
                                                         let makeBookedServices = item.app_services.split(",");
-                                                        doConsole(makeBookedServices);
                                                         for (let i = 0; i < item.sal_services.length; i++) {
                                                             if (makeBookedServices.includes(item.sal_services[i].s_name)) {
                                                                 item.sal_services[i].isAdded = true
@@ -599,7 +666,6 @@ const AppointSchedule = () => {
                                                             }
                                                         }
                                                         navigate('SeeAllServices', item)
-                                                        doConsole(item.sal_services)
                                                     }}
                                                     style={{ alignSelf: 'flex-end', marginTop: 15, paddingVertical: 10, borderRadius: 8, backgroundColor: acolors.primary, width: 126, alignItems: 'center', justifyContent: 'center' }}>
                                                     <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 16 }}>Reschedule</Text>
@@ -607,7 +673,7 @@ const AppointSchedule = () => {
                                             }
                                         </View>
                                         <TouchableOpacity
-                                            onPress={() => navigate('CancellationPolicy',{ data: item.cancellation_policy })}
+                                            onPress={() => navigate('CancellationPolicy', { data: item.cancellation_policy })}
                                             style={{ width: "100%", borderRadius: 8, marginTop: 10, paddingVertical: 10, paddingHorizontal: 10, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.3)' }}>
                                             <MarkerCancel />
                                             <Text style={{ fontFamily: 'PMe', fontSize: 10, color: 'white', marginLeft: 5 }}>Read cancellation policy</Text>
@@ -624,12 +690,15 @@ const AppointSchedule = () => {
 
                         <FlatList
                             data={history}
+                            ref={filterFlatListRef}
+                            getItemLayout={getItemLayout}
                             keyExtractor={(item, index) => index.toString()}
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={{ paddingBottom: 200 }}
                             renderItem={({ item, index }) => {
+                                item.toScroll && !isDoneScrolling && scrollToIndexNow(index);
                                 return (
-                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8 }}>
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 20, marginTop: 20, backgroundColor: 'rgba(27, 27, 27, 1)', borderRadius: 8, borderWidth: item.toScroll ? 1 : 0, borderColor: 'white' }}>
                                         {/* <View style={{ paddingHorizontal: 20 }}> */}
                                         <TouchableOpacity
                                             activeOpacity={1}
@@ -733,7 +802,6 @@ const AppointSchedule = () => {
                                         <TouchableOpacity
                                             onPress={() => {
                                                 let makeBookedServices = item.app_services.split(",");
-                                                doConsole(makeBookedServices);
                                                 for (let i = 0; i < item.sal_services.length; i++) {
                                                     if (makeBookedServices.includes(item.sal_services[i].s_name)) {
                                                         item.sal_services[i].isAdded = true
@@ -742,7 +810,6 @@ const AppointSchedule = () => {
                                                 item.app_id = null;
                                                 item.app_date = null;
                                                 item.app_status = null;
-                                                doConsole(item)
                                                 navigate('SeeAllServices', item)
                                                 // navigateFromStack('HomeStack', 'SalonDetails')
                                             }}

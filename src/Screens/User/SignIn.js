@@ -233,11 +233,11 @@ const SignIn = () => {
                 getUserInfo(result.accessToken);
 
             } else {
-                alertRef.alertWithType('error',"Error","Something went wrong please try again later.")
+                alertRef.alertWithType('error', "Error", "Something went wrong please try again later.")
                 console.log("cancleed");
             }
         } catch (e) {
-            alertRef.alertWithType('error',"Error","Something went wrong please try again later.")
+            alertRef.alertWithType('error', "Error", "Something went wrong please try again later.")
 
             console.log(e);
             // return { error: true };
@@ -269,6 +269,8 @@ const SignIn = () => {
             signup_me_up(data.id, data.email, data.name, "FACEBOOK");
         })
     }
+
+  
 
 
 
@@ -350,7 +352,7 @@ const SignIn = () => {
                             style={{ marginTop: 30 }}
                             onPress={() => navigate('SignUp')}
                         >
-                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Don’t have an account? <Text style={{color:acolors.primary}}>Sign Up</Text></Text>
+                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Don’t have an account? <Text style={{ color: acolors.primary }}>Sign Up</Text></Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

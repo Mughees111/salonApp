@@ -160,7 +160,7 @@ const BookAppointment = (props) => {
             app_date: selectedDate,
             app_est_duration: servicesTotal.servicesTime,
             app_start_time: arr[0].ss_start_time,
-            app_status: "payment_pending",
+            app_status: props.route.params?.data?.status ?? "payment_pending",
             sal_id: props?.route?.params?.data?.sal_id,
             app_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null
         }
@@ -172,6 +172,12 @@ const BookAppointment = (props) => {
                 setLoading(false)
                 doConsole(data)
                 if (data.action == 'success') {
+                    if(reqObj.app_id){
+                        navigate('AppointBooked', selectedDate + ", " + arr[0].ss_start_time);
+                        return;
+                    }
+                    
+                    
                     // alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
                     // appointmnet object
                     // if (props?.route?.params?.data?.mobile_pay == '1') {
@@ -182,7 +188,7 @@ const BookAppointment = (props) => {
                     // }
                     // else props.navigation.popToTop();
 
-                    // navigate('AppointBooked', selectedDate + ", " + arr[0].ss_start_time);
+                    
                 }
                 else {
                     alertRef.alertWithType('error', 'Error', data.error);

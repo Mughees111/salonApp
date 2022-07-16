@@ -1,6 +1,6 @@
 
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native'
 import { navigate } from '../../../Navigations';
 import { ArrowRight, FbIcon, GoogleIcon, LOGO } from '../../Components/Svgs';
@@ -32,16 +32,17 @@ var alertRef;
 const SignUp = () => {
 
 
-    const [username, setUsername] = useState('Testing OTP')
-    const [email, setEmail] = useState('otp@otp.com')
+    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
 
-    const [phone, setPhone] = useState('3134081068')
-    const [password, setPassword] = useState('12345678')
-    const [cPass, setCPass] = useState('12345678')
+    const [phone, setPhone] = useState('')
+    const [password, setPassword] = useState('')
+    const [cPass, setCPass] = useState('')
     const [loading, setLoading] = useState(false)
-    const [phoneCode, setPhoneCode] = useState('+1');
+    const [phoneCode, setPhoneCode] = useState('');
 
     const [showPass, setShowPass] = useState(true);
+    const [countriesCode, setCountriesCode] = useState([]);
 
     function doNext() {
 
@@ -79,12 +80,13 @@ const SignUp = () => {
             username,
             password,
             phone,
+            country_code: phoneCode,
             device_model: Device?.modelName ? Device?.modelName : null,
             device_manufactur: Device?.manufacturer ? Device?.manufacturer : null
         };
 
         const sendOtpObj = {
-            country_code: phoneCode,
+            c_code: phoneCode,
             phone: phone,
             code_text: "321"
         }
@@ -96,6 +98,7 @@ const SignUp = () => {
 
                     apiRequest(sendOtpObj, 'send_otp')
                         .then(data => {
+                            console.log(data)
                             if (data.action == 'success') {
                                 navigate('OTP', {
                                     slip: data.slip,
@@ -103,6 +106,7 @@ const SignUp = () => {
                                 })
                             }
                             else alertRef.alertWithType("error", "Error", data.error);
+                            setLoading(false)
                         })
                         .catch(err => {
                             alertRef.alertWithType("error", "Error", "Network Error");
@@ -446,6 +450,27 @@ const SignUp = () => {
         })
     }
 
+    function get_countries_code() {
+        setLoading(true)
+        apiRequest({}, 'get_countries_code')
+            .then(data => {
+                if (data.action == 'success') {
+                    console.log(data)
+                    setCountriesCode(data.data)
+                }
+                setLoading(false)
+
+            })
+            .catch(err => {
+                setLoading(false)
+            })
+    }
+
+
+    useEffect(() => {
+        get_countries_code();
+    }, [])
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -490,7 +515,7 @@ const SignUp = () => {
                                 {/* <Text>92</Text> */}
                                 <PrivacyPicker
                                     selected={{ title: "+1" }}
-                                    data={[{ title: "+1" }]}
+                                    data={countriesCode}
                                     onValueChange={(index, title) => {
                                         setPhoneCode(title.title);
                                         // setCondition(title.title)
@@ -553,8 +578,8 @@ const SignUp = () => {
                                 navigate('SignIn')
                             }}
                         >
-                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Already have an account?<Text style={{color:acolors.primary}}> Sign In</Text></Text> 
-                            
+                            <Text style={{ alignSelf: 'center', fontSize: 16, color: acolors.white, marginTop: 20, fontFamily: 'PMe' }}>Already have an account?<Text style={{ color: acolors.primary }}> Sign In</Text></Text>
+
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
