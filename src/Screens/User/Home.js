@@ -442,7 +442,7 @@ const Home = (props) => {
             {loading && !refreshing && <Loader />}
             <DropdownAlert ref={(ref) => alertRef = ref} />
             <Image
-                source={require('../../assets/HomeImg1.png')}
+                source={tabs.men ? require('../../assets/HomeImg1.png') :require('../../assets/womenHome.png')}
                 style={{ width: "100%", resizeMode: 'stretch', }}
             />
             {/*  position: 'absolute', top: 0  */}

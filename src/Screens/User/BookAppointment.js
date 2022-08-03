@@ -15,6 +15,7 @@ import { retrieveItem, useForceUpdate, doConsole, formatDate } from '../../utils
 import Loader from '../../utils/Loader';
 import DropdownAlert from 'react-native-dropdownalert';
 import { Context } from '../../Context/DataContext';
+import CustomTextInput from '../../Components/CustomTextInput';
 
 
 
@@ -31,12 +32,15 @@ const BookAppointment = (props) => {
     const [loading, setLoading] = useState(false);
 
     const [gender, setGender] = useState(props?.route?.params?.data?.user_gender ? props?.route?.params?.data?.user_gender : '')
+    const params = props.route.params.data;
     const currentDateObj = new Date();
     const [currentDate, setCurrentDate] = useState()
     const [selectedDate, setSelectedDate] = useState('')
     const bookedServices = props.route.params.bookedServices;
     const [salSlots, setSalSlots] = useState([]);
     const [bookedSlots, setBookedSlots] = useState([]);
+    const [comeToLocation, setComeToLocation] = useState('1');
+    const [locationAddress, setLocationAddress] = useState('');
 
 
     const [arr, setArr] = useState([]);
@@ -99,7 +103,7 @@ const BookAppointment = (props) => {
     function get_salon_slots(date) {
 
         // var device_datetime_sql = currentDateObj.getTime();
-        var device_datetime_sql = formatDate(new Date()) + currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
+        var device_datetime_sql = formatDate(new Date()) + " " +  currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
         var service_time = 0;
 
 
@@ -114,12 +118,14 @@ const BookAppointment = (props) => {
             appoint_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null,
             device_datetime_sql
         }
-        doConsole(reqObj)
-        setLoading(true)
+        console.log(reqObj)
+
+        doConsole(reqObj);
+        setLoading(true);
         apiRequest(reqObj, 'get_salon_slots')
             .then(data => {
-                // doConsole(data)
-                setLoading(false)
+                doConsole(data);
+                setLoading(false);
                 if (data.action == 'success') {
                     if (reqObj.appoint_id) {
                         let data1 = data.data
@@ -151,6 +157,11 @@ const BookAppointment = (props) => {
             return
         }
 
+        if(comeToLocation == '1' && locationAddress == '' ){
+            alertRef.alertWithType('error', 'Error', "Please enter location address");
+            return
+        }
+
         const servicesTotal = getServicesTotal()
         const reqObj = {
             token: state?.userData?.token,
@@ -162,7 +173,9 @@ const BookAppointment = (props) => {
             app_start_time: arr[0].ss_start_time,
             app_status: props.route.params?.data?.status ?? "payment_pending",
             sal_id: props?.route?.params?.data?.sal_id,
-            app_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null
+            app_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null,
+            come_to_location: comeToLocation,
+            location_address: locationAddress
         }
         doConsole(reqObj);
         setLoading(true)
@@ -172,12 +185,12 @@ const BookAppointment = (props) => {
                 setLoading(false)
                 doConsole(data)
                 if (data.action == 'success') {
-                    if(reqObj.app_id){
+                    if (reqObj.app_id) {
                         navigate('AppointBooked', selectedDate + ", " + arr[0].ss_start_time);
                         return;
                     }
-                    
-                    
+
+
                     // alertRef.alertWithType('success', 'Success', data.msg ? data.msg : "Your appointment has been booked successfully");
                     // appointmnet object
                     // if (props?.route?.params?.data?.mobile_pay == '1') {
@@ -188,7 +201,7 @@ const BookAppointment = (props) => {
                     // }
                     // else props.navigation.popToTop();
 
-                    
+
                 }
                 else {
                     alertRef.alertWithType('error', 'Error', data.error);
@@ -311,6 +324,40 @@ const BookAppointment = (props) => {
                                 }
                             </View>
 
+                            {
+                                params?.is_mobile &&
+                                <>
+                                    <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FFFFFF', marginTop: 15 }}>Will the Braider come to your location?</Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, width: "60%" }}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <TouchableOpacity
+                                                onPress={() => { setComeToLocation('1') }}
+                                                style={[styles.radioBtn, comeToLocation == '1' && { borderColor: acolors.primary }]}>
+                                                {comeToLocation == '1' && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: acolors.primary }}></View>}
+                                            </TouchableOpacity>
+                                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: "#E9E9E9", marginLeft: 7 }}>Yes</Text>
+                                        </View>
+                                        <View style={{ flexDirection: 'row', }}>
+                                            <TouchableOpacity
+                                                onPress={() => { setComeToLocation('0') }}
+                                                style={[styles.radioBtn, comeToLocation == '0' && { borderColor: acolors.primary }]}>
+                                                {comeToLocation == '0' && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: acolors.primary }}></View>}
+                                            </TouchableOpacity>
+                                            <Text style={{ fontFamily: 'PRe', fontSize: 14, color: "#E9E9E9", marginLeft: 7 }}>No</Text>
+                                        </View>
+                                    </View>
+                                    {
+                                        comeToLocation == 1 &&
+                                        <CustomTextInput
+                                            onChangeText={setLocationAddress}
+                                            placeholder="Please enter your location's address"
+                                            style={{ marginTop: 20 }}
+                                        />
+                                    }
+                                </>
+                            }
+
+
                             <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FFFFFF', marginTop: 15 }}>Select Gender</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
                                 <View style={{ flexDirection: 'row' }}>
@@ -338,6 +385,7 @@ const BookAppointment = (props) => {
                                     <Text style={{ fontFamily: 'PRe', fontSize: 14, color: "#E9E9E9", marginLeft: 7 }}>Other</Text>
                                 </View>
                             </View>
+
                             <MainButton
                                 onPress={() => {
                                     book_appoint();

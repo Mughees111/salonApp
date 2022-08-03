@@ -92,7 +92,7 @@ const ForgetPassOpt = (props) => {
                             ignoreCase={true}
                             inputPosition='center'
                             size={50}
-                            codeLength={4}
+                            codeLength={6}
                             onFulfill={(isValid) => { setOTP(isValid) }}
                             containerStyle={{ marginTop: 30 }}
                             codeInputStyle={{ width: 42, height: 42, borderRadius: 8, borderWidth: 1.3 }}
@@ -133,7 +133,7 @@ const ForgetPassOpt = (props) => {
             </SafeAreaView>
             <TouchableOpacity
                 onPress={() => verifyOTP()}
-                disabled={otp.length == 4 ? false : true}
+                disabled={otp.length == 6 ? false : true}
                 style={{
                     width: "100%",
                     height: 45,
@@ -148,7 +148,7 @@ const ForgetPassOpt = (props) => {
                     alignSelf: 'center',
                     opacity: otp.length == 4 ? 1 : 0.6
                 }}>
-                <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 16 }}>Sign Up</Text>
+                <Text style={{ color: '#111111', fontFamily: 'PMe', fontSize: 16 }}>Next</Text>
             </TouchableOpacity>
 
         </View >

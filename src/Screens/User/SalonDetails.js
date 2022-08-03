@@ -209,12 +209,12 @@ const SalonDetails = (props) => {
                             <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF' }}>{params?.sal_contact_person}
                                 <Text style={{ color: 'rgba(255,255,255,0.5)' }}>(Owner)</Text>
                             </Text>
-                            
+
                             <TouchableOpacity onPress={() => {
                                 Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=&destination=${params?.sal_address}`);
                                 // +", "+params?.sal_city+", "+ params?.sal_country
                             }}>
-                                <Text style={{ fontFamily: 'PRe',textDecorationLine:'underline', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_address}</Text>
+                                <Text style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_address}</Text>
                             </TouchableOpacity>
                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_city}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
@@ -226,6 +226,12 @@ const SalonDetails = (props) => {
                                 }
                                 <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'white', marginLeft: 10 }}></View>
                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF', marginLeft: 5 }}>{params?.distance} mi</Text>
+                                {
+                                    params?.is_mobile == 1 &&
+                                    <View style={{ position: 'absolute',bottom:27,right:0, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: acolors.primary, marginBottom: 10 }}>
+                                        <Text style={{ color: acolors.bgColor, fontFamily: 'PRe' }}>I am Mobile</Text>
+                                    </View>
+                                }
                                 <View style={{ position: 'absolute', bottom: 0, right: 0, flexDirection: 'row' }}>
                                     <TouchableOpacity
                                         onPress={() => {

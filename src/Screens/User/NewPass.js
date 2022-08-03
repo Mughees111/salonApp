@@ -97,7 +97,7 @@ const NewPass = (props) => {
 
     function doNewPass() {
 
-        setLoading(true);
+        
         if (newPass.length < 8) {
             alertRef.alertWithType('error', 'Error', 'Password length must be 8');
             return;
@@ -111,7 +111,7 @@ const NewPass = (props) => {
             new_pass: newPass,
             slip: props?.route?.params?.slip
         }
-
+        setLoading(true);
         apiRequest(reqObj, 'new_password')
             .then(data => {
                 setLoading(false);
