@@ -218,7 +218,7 @@ const SalonDetails = (props) => {
                             </TouchableOpacity>
                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 0 }}>{params?.sal_city}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
-                                {params?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                {params?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                     <>
                                         <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{params?.sal_ratings}</Text>
                                         <RattingStarIcon />

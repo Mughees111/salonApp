@@ -252,7 +252,7 @@ const NearBy = () => {
                                                         <Text numberOfLines={3} style={{ fontFamily: 'PRe', textDecorationLine: 'underline', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{v?.sal_address}</Text>
                                                     </TouchableOpacity>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                        {v?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                        {v?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                             <>
                                                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{v?.sal_ratings}</Text>
                                                                 <RattingStarIcon />
@@ -375,7 +375,7 @@ const NearBy = () => {
                                     </TouchableOpacity>
 
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                        {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                             <>
                                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
                                                 <RattingStarIcon />

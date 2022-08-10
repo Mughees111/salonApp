@@ -337,7 +337,7 @@ const AppointSchedule = (props) => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                         <>
                                                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
                                                             <RattingStarIcon />
@@ -520,7 +520,7 @@ const AppointSchedule = (props) => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                         <>
                                                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
                                                             <RattingStarIcon />
@@ -714,7 +714,7 @@ const AppointSchedule = (props) => {
                                                 <Text style={{ fontFamily: 'PMe', fontSize: 17, color: '#FCFCFC', }}>{item.sal_name}</Text>
                                                 <Text numberOfLines={3} style={{ fontFamily: 'PRe', fontSize: 12, color: '#FCFCFC', marginTop: 5, }}>{item.sal_address}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                         <>
                                                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
                                                             <RattingStarIcon />

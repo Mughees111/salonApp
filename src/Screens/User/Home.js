@@ -412,7 +412,7 @@ const Home = (props) => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                        {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                        {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                             <>
                                 <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{item?.sal_ratings}</Text>
                                 <RattingStarIcon />
@@ -664,7 +664,7 @@ const Home = (props) => {
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                                            {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                            {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                 <>
                                                     <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF', marginRight: 2 }}>{item?.sal_ratings}</Text>
                                                     <RattingStarIcon />
@@ -733,7 +733,7 @@ const Home = (props) => {
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                    {item?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                         <>
                                                             <Text style={{ fontFamily: 'PRe', fontSize: 14, color: '#FFFFFF', marginRight: 2 }}>{item?.sal_ratings}</Text>
                                                             <RattingStarIcon />

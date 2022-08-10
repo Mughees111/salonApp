@@ -130,7 +130,7 @@ const ViewAll = (props) => {
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                                                    {v?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"No rating yet"}</Text> :
+                                                    {v?.sal_ratings == 0 ? <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{"*** (0)"}</Text> :
                                                         <>
                                                             <Text style={{ fontFamily: 'PRe', fontSize: 12, color: '#FFFFFF' }}>{v?.sal_ratings}</Text>
                                                             <RattingStarIcon />

@@ -103,11 +103,14 @@ const BookAppointment = (props) => {
     function get_salon_slots(date) {
 
         // var device_datetime_sql = currentDateObj.getTime();
-        var device_datetime_sql = formatDate(new Date()) + " " +  currentDateObj.getHours() + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
+        var hours = currentDateObj.getHours()
+        if(hours < 10) hours = "0"+currentDateObj.getHours();
+        var device_datetime_sql = formatDate(new Date()) + " " +  hours + ":" + currentDateObj.getMinutes() + ":" + currentDateObj.getSeconds();
         var service_time = 0;
 
 
-        // console.log(device_datetime_sql)
+        // 2022-08-05 6:43:42
+
 
 
         const reqObj = {
@@ -118,8 +121,6 @@ const BookAppointment = (props) => {
             appoint_id: props?.route?.params?.data?.app_id ? props?.route?.params?.data?.app_id : null,
             device_datetime_sql
         }
-        console.log(reqObj)
-
         doConsole(reqObj);
         setLoading(true);
         apiRequest(reqObj, 'get_salon_slots')
